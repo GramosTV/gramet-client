@@ -17,7 +17,7 @@ export async function fetchWithAuth(
   const headers = {
     ...options.headers,
     Authorization: accessToken ? `Bearer ${accessToken}` : '',
-    'Content-Type': 'application/json',
+    // 'Content-Type': 'application/json',
   };
 
   const response = await fetch(url, { ...options, headers });

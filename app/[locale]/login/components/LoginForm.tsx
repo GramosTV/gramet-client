@@ -41,8 +41,8 @@ const LoginForm: React.FC = () => {
   };
   const t = useTranslations('Login');
   return (
-    <div className="max-w-md mx-auto p-6 bg-gray-100 rounded-md shadow-md flex-grow">
-      <h1 className="text-xl font-bold mb-4">{t('login')}</h1>
+    <div className="flex-grow max-w-md p-6 mx-auto bg-gray-100 rounded-md shadow-md">
+      <h1 className="mb-4 text-xl font-bold">{t('login')}</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Email Field */}
         <div>
@@ -56,7 +56,7 @@ const LoginForm: React.FC = () => {
             placeholder="Email"
             className={`w-full mt-1 p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md`}
           />
-          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+          {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
         </div>
 
         {/* Password Field */}
@@ -71,7 +71,7 @@ const LoginForm: React.FC = () => {
             placeholder={t('pass')}
             className={`w-full mt-1 p-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-md`}
           />
-          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+          {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>}
         </div>
 
         <button

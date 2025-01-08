@@ -14,7 +14,7 @@ type ProductFormValues = {
   brand: string;
   code: string;
   colors: Color[];
-  material: string[];
+  materials: string[];
   price: number;
   images: FileList;
 };
@@ -42,7 +42,7 @@ const AddProducts: React.FC = () => {
     formData.append('brand', data.brand);
     formData.append('code', data.code);
     formData.append('price', data.price.toString());
-    formData.append('material', JSON.stringify(data.material));
+    formData.append('materials', JSON.stringify(data.materials));
     formData.append('colors', JSON.stringify(data.colors));
 
     Array.from(data.images).forEach((file) => {
@@ -62,8 +62,8 @@ const AddProducts: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-gray-100 rounded-md shadow-md flex-grow">
-      <h1 className="text-xl font-bold mb-4">Add Product</h1>
+    <div className="flex-grow max-w-2xl p-6 mx-auto bg-gray-100 rounded-md shadow-md">
+      <h1 className="mb-4 text-xl font-bold">Add Product</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Name Field */}
         <div>
@@ -74,7 +74,7 @@ const AddProducts: React.FC = () => {
             placeholder="Product Name"
             className={`w-full mt-1 p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md`}
           />
-          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+          {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>}
         </div>
 
         {/* Brand Field */}
@@ -86,7 +86,7 @@ const AddProducts: React.FC = () => {
             placeholder="Product Brand"
             className={`w-full mt-1 p-2 border ${errors.brand ? 'border-red-500' : 'border-gray-300'} rounded-md`}
           />
-          {errors.brand && <p className="text-red-500 text-sm mt-1">{errors.brand.message}</p>}
+          {errors.brand && <p className="mt-1 text-sm text-red-500">{errors.brand.message}</p>}
         </div>
 
         {/* Code Field */}
@@ -98,7 +98,7 @@ const AddProducts: React.FC = () => {
             placeholder="Product Code"
             className={`w-full mt-1 p-2 border ${errors.code ? 'border-red-500' : 'border-gray-300'} rounded-md`}
           />
-          {errors.code && <p className="text-red-500 text-sm mt-1">{errors.code.message}</p>}
+          {errors.code && <p className="mt-1 text-sm text-red-500">{errors.code.message}</p>}
         </div>
 
         {/* Colors Field */}
@@ -138,7 +138,7 @@ const AddProducts: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => removeColor(index)}
-                  className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                  className="p-2 text-white bg-red-500 rounded-md hover:bg-red-600"
                 >
                   Remove
                 </button>
@@ -146,8 +146,8 @@ const AddProducts: React.FC = () => {
             ))}
             <button
               type="button"
-              onClick={() => addColor({ name: '', hex: '', stock: 0 })}
-              className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              onClick={() => addColor({ name: '', hex: '', stock: null as any })}
+              className="p-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
             >
               Add Color
             </button>
@@ -158,11 +158,11 @@ const AddProducts: React.FC = () => {
         <div>
           <label className="block text-sm font-medium text-gray-700">Materials</label>
           <Controller
-            name="material"
+            name="materials"
             control={control}
             rules={{ required: 'At least one material is required' }}
             render={({ field: { value = [], onChange } }) => (
-              <div className="space-y-2 mt-1">
+              <div className="mt-1 space-y-2">
                 {['leather', 'cotton', 'synthetic'].map((material) => (
                   <label key={material} className="flex items-center space-x-2">
                     <input
@@ -174,7 +174,7 @@ const AddProducts: React.FC = () => {
                           : value.filter((v: string) => v !== material);
                         onChange(newValue);
                       }}
-                      className="rounded border-gray-300"
+                      className="border-gray-300 rounded"
                     />
                     <span className="text-sm text-gray-700 capitalize">{material}</span>
                   </label>
@@ -182,7 +182,7 @@ const AddProducts: React.FC = () => {
               </div>
             )}
           />
-          {errors.material && <p className="text-red-500 text-sm mt-1">{errors.material.message}</p>}
+          {errors.materials && <p className="mt-1 text-sm text-red-500">{errors.materials.message}</p>}
         </div>
 
         {/* Price Field */}
@@ -198,7 +198,7 @@ const AddProducts: React.FC = () => {
             placeholder="Product Price"
             className={`w-full mt-1 p-2 border ${errors.price ? 'border-red-500' : 'border-gray-300'} rounded-md`}
           />
-          {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
+          {errors.price && <p className="mt-1 text-sm text-red-500">{errors.price.message}</p>}
         </div>
 
         {/* Images Field */}
@@ -210,10 +210,10 @@ const AddProducts: React.FC = () => {
             multiple
             className={`w-full mt-1 p-2 border ${errors.images ? 'border-red-500' : 'border-gray-300'} rounded-md`}
           />
-          {errors.images && <p className="text-red-500 text-sm mt-1">{errors.images.message}</p>}
+          {errors.images && <p className="mt-1 text-sm text-red-500">{errors.images.message}</p>}
         </div>
 
-        <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700">
+        <button type="submit" className="w-full p-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">
           Submit
         </button>
       </form>
