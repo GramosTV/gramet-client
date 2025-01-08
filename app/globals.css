@@ -20,3 +20,8 @@ body {
   background: var(--background);
   font-family: 'Funnel Sans', Arial, Helvetica, sans-serif;
 }
+
+.btn-off {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

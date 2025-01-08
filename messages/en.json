@@ -1,0 +1,12 @@
+{
+  "Login": {
+    "login": "Log in",
+    "success": "Logged in successfully",
+    "fail": "Invalid login data",
+    "error-email-required": "Email required",
+    "error-pass-required": "Password required",
+    "pass": "Password",
+    "error-email-length": "Email must be at least 5 characters",
+    "error-pass-length": "Password must be at least 6 characters"
+  }
+}

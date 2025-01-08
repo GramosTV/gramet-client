@@ -1,0 +1,12 @@
+{
+  "Login": {
+    "login": "Zaloguj się",
+    "success": "Zalogowano pomyślnie",
+    "fail": "Nieprawidłowe dane logowania",
+    "pass": "Hasło",
+    "error-email-required": "Email wymagany",
+    "error-pass-required": "Hasło wymagane",
+    "error-email-length": "Email musi mieć przynajmniej 5 znaków",
+    "error-pass-length": "Hasło musi zawierać przynajmniej 6 znaków"
+  }
+}

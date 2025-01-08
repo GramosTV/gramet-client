@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { fetchWithAuth } from '../../../lib/auth-api';
 
 type Color = {
   name: string;
@@ -49,7 +50,7 @@ const AddProducts: React.FC = () => {
     });
 
     try {
-      const response = await fetch('/api/products', {
+      const response = await fetchWithAuth('/api/products', {
         method: 'POST',
         body: formData,
       });
