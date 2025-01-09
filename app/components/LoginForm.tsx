@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { fetchWithAuth, setAccessToken } from '../../../lib/auth-api';
+import { fetchWithAuth, setAccessToken } from '../lib/auth-api';
 import { useTranslations } from 'next-intl';
 import { Bounce, toast } from 'react-toastify';
 import Cookies from 'js-cookie';
@@ -44,7 +44,6 @@ const LoginForm: React.FC = () => {
     <div className="flex-grow max-w-md p-6 mx-auto bg-gray-100 rounded-md shadow-md">
       <h1 className="mb-4 text-xl font-bold">{t('login')}</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Email Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Email</label>
           <input
@@ -58,8 +57,6 @@ const LoginForm: React.FC = () => {
           />
           {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
         </div>
-
-        {/* Password Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700">{t('pass')}</label>
           <input

@@ -1,15 +1,10 @@
 'use client';
-import React from 'react';
+import { Color } from '@/app/common';
+import { fetchWithAuth } from '@/app/lib/auth-api';
+import React, { useState } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { fetchWithAuth } from '../../../lib/auth-api';
 
-type Color = {
-  name: string;
-  hex: string;
-  stock: number;
-};
-
-type ProductFormValues = {
+interface ProductFormValues {
   name: string;
   brand: string;
   code: string;
@@ -17,7 +12,8 @@ type ProductFormValues = {
   materials: string[];
   price: number;
   images: FileList;
-};
+  public: boolean;
+}
 
 const AddProducts: React.FC = () => {
   const {
@@ -25,7 +21,11 @@ const AddProducts: React.FC = () => {
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<ProductFormValues>();
+  } = useForm<ProductFormValues>({
+    defaultValues: {
+      public: true,
+    },
+  });
 
   const {
     fields: colorFields,
@@ -35,7 +35,14 @@ const AddProducts: React.FC = () => {
     control,
     name: 'colors',
   });
-
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const previews = Array.from(files).map((file) => URL.createObjectURL(file));
+      setImagePreviews(previews);
+    }
+  };
   const onSubmit = async (data: ProductFormValues) => {
     const formData = new FormData();
     formData.append('name', data.name);
@@ -44,6 +51,7 @@ const AddProducts: React.FC = () => {
     formData.append('price', data.price.toString());
     formData.append('materials', JSON.stringify(data.materials));
     formData.append('colors', JSON.stringify(data.colors));
+    formData.append('public', data.public.toString());
 
     Array.from(data.images).forEach((file) => {
       formData.append('images', file);
@@ -205,12 +213,24 @@ const AddProducts: React.FC = () => {
         <div>
           <label className="block text-sm font-medium text-gray-700">Images</label>
           <input
-            {...register('images', { required: 'Images are required' })}
+            {...register('images')}
             type="file"
             multiple
+            onChange={handleImageChange}
             className={`w-full mt-1 p-2 border ${errors.images ? 'border-red-500' : 'border-gray-300'} rounded-md`}
           />
           {errors.images && <p className="mt-1 text-sm text-red-500">{errors.images.message}</p>}
+          <div className="flex flex-wrap gap-2 mt-4">
+            {imagePreviews.map((src, index) => (
+              <img key={index} src={src} alt={`Preview ${index}`} className="object-cover w-24 h-24 rounded-md" />
+            ))}
+          </div>
+        </div>
+
+        {/* Public Field */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Public</label>
+          <input {...register('public')} type="checkbox" className="mt-1" />
         </div>
 
         <button type="submit" className="w-full p-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">

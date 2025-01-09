@@ -5,34 +5,32 @@ import { locales } from '../../i18n';
 import '../globals.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import ReactQueryProvider from '../components/ReactQueryProvider';
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-export default async function LocaleLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: any; // Explicit type for locale
-}) {
+export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: any }) {
   const { locale } = await params;
 
   let messages;
   try {
     messages = (await import(`../../messages/${locale}.json`)).default;
   } catch (error) {
-    notFound(); // Redirect to 404 if locale messages are missing
+    notFound();
   }
 
   return (
-    <html lang={locale}>
-      <body>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
-        </NextIntlClientProvider>
-        <ToastContainer />
-      </body>
-    </html>
+    <ReactQueryProvider>
+      <html lang={locale}>
+        <body>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+          <ToastContainer />
+        </body>
+      </html>
+    </ReactQueryProvider>
   );
 }

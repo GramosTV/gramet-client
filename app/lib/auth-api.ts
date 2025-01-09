@@ -31,6 +31,9 @@ export async function fetchWithAuth(
     }
   }
 
+  if (!response.ok) {
+    throw new Error('Something went wrong');
+  }
   return response;
 }
 
