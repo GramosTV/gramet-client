@@ -32,7 +32,11 @@ const ViewProducts = () => {
       return response.json();
     },
   });
-  // TO DO: CONFIRM DELTE
+  const handleDelete = (id: string) => {
+    if (confirm('Are you sure you want to delete this product?')) {
+      mutation.mutate(id);
+    }
+  };
   const mutation = useMutation({
     mutationFn: async (id: string) => {
       const response = await fetchWithAuth(`/api/products/${id}`, {
@@ -107,7 +111,7 @@ const ViewProducts = () => {
                     Edit
                   </Link>
                   <button
-                    onClick={() => mutation.mutate(item._id)}
+                    onClick={() => handleDelete(item._id)}
                     className="px-2 py-1 text-white bg-red-500 rounded hover:bg-red-600"
                   >
                     Delete
