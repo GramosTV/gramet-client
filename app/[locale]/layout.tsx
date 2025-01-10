@@ -14,6 +14,10 @@ export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
+import { config } from '@fortawesome/fontawesome-svg-core';
+import '@fortawesome/fontawesome-svg-core/styles.css';
+config.autoAddCss = false;
+
 export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: any }) {
   const { locale } = await params;
 

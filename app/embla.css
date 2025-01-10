@@ -1,11 +1,10 @@
 .embla {
   /* max-width: 48rem; */
-  margin: auto;
   position: relative;
   /* --slide-height: 19rem; */
   max-width: calc(16rem * 3.5);
   --slide-height: calc(7.5rem * 3.5);
-  --slide-spacing: 5rem;
+  --slide-spacing: 3rem;
   --slide-size: 100%;
 }
 .embla__viewport {
@@ -32,6 +31,7 @@
   align-items: center;
   justify-content: center;
   height: var(--slide-height);
+  width: var(--max-width);
   user-select: none;
 }
 .embla__controls {

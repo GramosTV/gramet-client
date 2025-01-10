@@ -107,7 +107,7 @@ const EditProduct: React.FC = () => {
   }
 
   return (
-    <div className="flex-grow max-w-2xl p-6 mx-auto bg-gray-100 rounded-md shadow-md">
+    <div className="max-w-2xl p-6 bg-gray-200 text-black max-h-[calc(100vh-var(--header-height))] overflow-y-auto grow pl-16">
       <h1 className="mb-4 text-xl font-bold">Edit Product</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Name Field */}

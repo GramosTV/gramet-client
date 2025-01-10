@@ -41,7 +41,7 @@ const Login: React.FC = () => {
   };
   const t = useTranslations('Login');
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-[calc(100vh-var(--header-height)*2)]">
       <div className="flex-grow max-w-md p-6 mx-auto bg-gray-100 rounded-md shadow-md">
         <h1 className="mb-4 text-xl font-bold">{t('login')}</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -62,7 +62,7 @@ const Login: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700">{t('pass')}</label>
             <input
               {...register('password', {
-                required: t('error-email-required'),
+                required: t('error-pass-required'),
                 minLength: { value: 6, message: t('error-pass-length') },
               })}
               type="password"

@@ -65,7 +65,7 @@ const ViewProducts = () => {
   }
 
   return (
-    <div className="max-w-[800px] mx-auto">
+    <div className="p-6 bg-gray-200 text-black max-h-[calc(100vh-var(--header-height))] grow">
       <div className="p-4">
         <div className="mb-4">
           <label className="mr-2">Items per page:</label>

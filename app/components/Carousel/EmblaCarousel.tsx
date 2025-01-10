@@ -14,7 +14,7 @@ const EmblaCarousel: React.FC = () => {
 
   const progressNode = useRef<any>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel(options, [
-    Autoplay({ playOnInit: true, delay: 4000, stopOnInteraction: false }),
+    Autoplay({ playOnInit: true, delay: 4000, stopOnInteraction: true }),
   ]);
 
   const { prevBtnDisabled, nextBtnDisabled, onPrevButtonClick, onNextButtonClick } = usePrevNextButtons(emblaApi);
@@ -32,7 +32,7 @@ const EmblaCarousel: React.FC = () => {
   }, [emblaApi]);
 
   return (
-    <div className="embla">
+    <div className="embla my-14 mx-auto">
       <div className="embla__controls">
         <div className="embla__buttons">
           <PrevButton onClick={() => onAutoplayButtonClick(onPrevButtonClick)} disabled={prevBtnDisabled} />
@@ -43,8 +43,14 @@ const EmblaCarousel: React.FC = () => {
         <div className="embla__container">
           {slides.map((index) => (
             <div className="embla__slide" key={index}>
-              <div className="embla__slide__number">
-                <Image src={`/images/carousel/${index + 1}.jpg`} fill={true} alt="Picture of the author" />
+              <div className="embla__slide__number relative w-full h-full">
+                <Image
+                  src={`/images/carousel/${index + 1}.jpg`}
+                  layout="fill"
+                  objectFit="cover"
+                  className="rounded-[1.8rem]"
+                  alt={`Slide ${index + 1}`}
+                />
               </div>
             </div>
           ))}

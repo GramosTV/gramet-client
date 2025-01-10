@@ -70,7 +70,7 @@ const AddProducts: React.FC = () => {
   };
 
   return (
-    <div className="flex-grow max-w-2xl p-6 mx-auto bg-gray-100 rounded-md shadow-md">
+    <div className="max-w-2xl p-6 bg-gray-200 text-black max-h-[calc(100vh-var(--header-height))] overflow-y-auto grow pl-16">
       <h1 className="mb-4 text-xl font-bold">Add Product</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Name Field */}
@@ -217,7 +217,9 @@ const AddProducts: React.FC = () => {
             type="file"
             multiple
             onChange={handleImageChange}
-            className={`w-full mt-1 p-2 border ${errors.images ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+            className={`bg-gray-300 w-full mt-1 p-2 border ${
+              errors.images ? 'border-red-500' : 'border-gray-300'
+            } rounded-md`}
           />
           {errors.images && <p className="mt-1 text-sm text-red-500">{errors.images.message}</p>}
           <div className="flex flex-wrap gap-2 mt-4">
