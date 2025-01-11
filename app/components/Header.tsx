@@ -1,19 +1,32 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBasketShopping, faCartShopping, faUser } from '@fortawesome/free-solid-svg-icons';
-import { Category } from '../common';
-import { CartProvider, useCart } from '@/context/CartContext';
+import { Cart, Category } from '../common';
+import { useLocalStorage } from 'usehooks-ts';
+import { useQuery } from '@tanstack/react-query';
+import { fetchWithAuth } from '../lib/auth-api';
 
 const Page = () => {
-  return <AuthProvider children={<CartProvider children={<Header />} />} />;
+  return <AuthProvider children={<Header />} />;
 };
 
 const Header = () => {
   const { isLoggedIn, user } = useAuth();
-  const { cart, setCart } = useCart();
+  useQuery({
+    queryKey: ['cart'],
+    queryFn: async () => {
+      const response = await fetchWithAuth('/api/cart');
+      const data = await response.json();
+      setCart(data.itemData);
+      return data;
+    },
+    retry: 1,
+  });
+  const [cart, setCart, removeValue] = useLocalStorage<Cart>('cart', []);
+
   return (
     <div className="navbar bg-base-100 h-[var(--header-height)]">
       <div className="navbar-start">
@@ -147,13 +160,17 @@ const Header = () => {
                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                   />
                 </svg>
-                <span className="badge badge-sm indicator-item">{cart?.items.length}</span>
+                <span className="badge badge-sm indicator-item">
+                  {cart?.reduce((sum, item) => sum + item.quantity, 0)}
+                </span>
               </div>
             </div>
             <div tabIndex={0} className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow">
               <div className="card-body">
-                <span className="text-lg font-bold">{cart?.items.length} Items</span>
-                <span className="text-info">Subtotal: $999</span>
+                <span className="text-lg font-bold">{cart?.reduce((sum, item) => sum + item.quantity, 0)} Items</span>
+                <span className="text-info">
+                  Subtotal: ${cart?.reduce((sum, item) => sum + item.quantity * item.price, 0)}
+                </span>
                 <div className="card-actions">
                   <button className="btn btn-primary btn-block">View cart</button>
                 </div>

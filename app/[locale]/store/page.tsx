@@ -1,5 +1,5 @@
 'use client';
-import { Category, Color } from '@/app/common';
+import { Cart, Category, Color } from '@/app/common';
 import { fetchWithAuth } from '@/app/lib/auth-api';
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
+import { useLocalStorage } from 'usehooks-ts';
 interface Res {
   products: SearchProduct[];
   pageCount: number;
@@ -20,12 +21,13 @@ interface SearchProduct {
   image: string;
   //   image: string;
 }
-const Page = () => {
+const Store = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(15);
   const [pageCount, setPageCount] = useState(0);
   const searchParams = useSearchParams();
   const category = searchParams.get('category');
+  const [cart, setCart, removeValue] = useLocalStorage('cart', []);
   const { data, isPending, isError } = useQuery({
     queryKey: ['products', page, limit, category],
     queryFn: async (): Promise<Res> => {
@@ -38,14 +40,24 @@ const Page = () => {
 
   const mutation = useMutation({
     mutationFn: async (productId: string) => {
-      const response = await fetchWithAuth(`/api/cart/${productId}`, {
+      const response = await fetchWithAuth(`/api/cart`, {
         method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId,
+          quantity: 1,
+          colorId: '6782d2a4596eb4c13e801e7f',
+        }),
       });
       if (!response.ok) {
         throw new Error('Failed to add to cart');
       }
+      return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (res) => {
+      setCart(res.itemData);
       toast.success('Product added successfully');
     },
     onError: (error: any) => {
@@ -107,7 +119,11 @@ const Page = () => {
 
                   <p className="mt-2">
                     {product.price} zł{' '}
-                    <FontAwesomeIcon icon={faCartPlus} onClick={() => mutation.mutate(product._id)} />
+                    <FontAwesomeIcon
+                      icon={faCartPlus}
+                      className="cursor-pointer"
+                      onClick={() => mutation.mutate(product._id)}
+                    />
                   </p>
                 </div>
               ))
@@ -148,4 +164,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default Store;

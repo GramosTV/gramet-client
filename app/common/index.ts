@@ -45,15 +45,11 @@ export enum Category {
 }
 
 export interface CartItem {
-  productId: string;
-
-  color: Color;
-
+  name: string;
+  image: string;
+  price: number;
+  colors: Color[];
   quantity: number;
 }
 
-export interface Cart {
-  userId: string;
-
-  items: CartItem[];
-}
+export type Cart = CartItem[];

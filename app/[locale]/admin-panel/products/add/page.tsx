@@ -1,5 +1,5 @@
 'use client';
-import { Color } from '@/app/common';
+import { Color, Category } from '@/app/common';
 import { fetchWithAuth } from '@/app/lib/auth-api';
 import React, { useState } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
@@ -8,6 +8,7 @@ interface ProductFormValues {
   name: string;
   brand: string;
   code: string;
+  category: Category;
   colors: Color[];
   materials: string[];
   price: number;
@@ -48,11 +49,11 @@ const AddProducts: React.FC = () => {
     formData.append('name', data.name);
     formData.append('brand', data.brand);
     formData.append('code', data.code);
+    formData.append('category', data.category);
     formData.append('price', data.price.toString());
     formData.append('materials', JSON.stringify(data.materials));
     formData.append('colors', JSON.stringify(data.colors));
-    formData.append('public', data.public.toString());
-
+    formData.append('public', data.public as any);
     Array.from(data.images).forEach((file) => {
       formData.append('images', file);
     });
@@ -109,6 +110,23 @@ const AddProducts: React.FC = () => {
           {errors.code && <p className="mt-1 text-sm text-red-500">{errors.code.message}</p>}
         </div>
 
+        {/* Category Field */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Category</label>
+          <select
+            {...register('category', { required: 'Category is required' })}
+            className={`w-full mt-1 p-2 border ${errors.category ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+          >
+            <option value="">Select Category</option>
+            {Object.values(Category).map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+          {errors.category && <p className="mt-1 text-sm text-red-500">{errors.category.message}</p>}
+        </div>
+
         {/* Colors Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Colors</label>
@@ -154,7 +172,7 @@ const AddProducts: React.FC = () => {
             ))}
             <button
               type="button"
-              onClick={() => addColor({ name: '', hex: '', stock: null as any })}
+              onClick={() => addColor({ name: '', hex: '', stock: 0 })}
               className="p-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
             >
               Add Color

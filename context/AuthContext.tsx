@@ -15,7 +15,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .split('; ')
       .find((row) => row.startsWith('accessToken='))
       ?.split('=')[1];
-    console.log(token);
     if (token) {
       setIsLoggedIn(true);
       try {

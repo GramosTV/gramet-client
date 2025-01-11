@@ -13,7 +13,6 @@ export async function fetchWithAuth(
   retry: boolean = false
 ): Promise<Response> {
   const accessToken = Cookies.get('accessToken');
-  console.log('accessToken: ' + accessToken);
   const headers = {
     ...options.headers,
     Authorization: accessToken ? `Bearer ${accessToken}` : '',
