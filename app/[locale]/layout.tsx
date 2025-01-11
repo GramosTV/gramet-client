@@ -16,6 +16,7 @@ export async function generateStaticParams() {
 
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+import Footer from '../components/Footer';
 config.autoAddCss = false;
 
 export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: any }) {
@@ -32,9 +33,10 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     <ReactQueryProvider>
       <html lang={locale}>
         <body>
-          <Header />
           <NextIntlClientProvider locale={locale} messages={messages}>
+            <Header />
             {children}
+            <Footer />
           </NextIntlClientProvider>
           <ToastContainer />
         </body>

@@ -3,17 +3,17 @@ type FetchOptions = RequestInit & {
   headers?: Record<string, string>;
 };
 
-interface TokenResponse {
+export interface TokenResponse {
   accessToken: string;
 }
 
 export async function fetchWithAuth(
   url: string,
   options: FetchOptions = {},
-  login: boolean = false
+  retry: boolean = false
 ): Promise<Response> {
   const accessToken = Cookies.get('accessToken');
-
+  console.log('accessToken: ' + accessToken);
   const headers = {
     ...options.headers,
     Authorization: accessToken ? `Bearer ${accessToken}` : '',
@@ -23,12 +23,13 @@ export async function fetchWithAuth(
   const response = await fetch(url, { ...options, headers });
 
   if (response.status === 401) {
-    const refreshed = await refreshAccessToken();
-    if (refreshed) {
-      return await fetchWithAuth(url, options);
-    } else {
-      throw new Error('Unauthorized: Unable to refresh token');
+    if (!retry) {
+      const refreshed = await refreshAccessToken();
+      if (refreshed) {
+        return await fetchWithAuth(url, options, true);
+      }
     }
+    throw new Error('Unauthorized: Unable to refresh token');
   }
 
   if (!response.ok) {

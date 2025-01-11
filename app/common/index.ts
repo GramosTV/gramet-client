@@ -31,3 +31,29 @@ export interface JwtRefreshPayload {
   jti: string;
   role: Roles;
 }
+
+export enum Category {
+  FURNITURE_HANDLES = 'Furniture handles',
+  FURNITURE_KNOBS = 'Furniture knobs',
+  FURNITURE_HOOKS = 'Furniture hooks',
+  FURNITURE_FEET = 'Furniture feet',
+  FURNITURE_LIGHTING = 'Furniture lighting',
+  TECHNICAL_ACCESSORIES = 'Technical accessories',
+  METAL_DECORATIONS = 'Metal decorations',
+  CARGO_BASKETS = 'Cargo baskets',
+  DRAWERS = 'Drawers',
+}
+
+export interface CartItem {
+  productId: string;
+
+  color: Color;
+
+  quantity: number;
+}
+
+export interface Cart {
+  userId: string;
+
+  items: CartItem[];
+}

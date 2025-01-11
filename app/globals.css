@@ -6,7 +6,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --header-height: 12vh;
+  --header-height: 8vh;
 }
 * {
   box-sizing: border-box;

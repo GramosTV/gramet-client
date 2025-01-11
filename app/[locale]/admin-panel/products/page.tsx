@@ -31,7 +31,9 @@ const ViewProducts = () => {
       const response = await fetchWithAuth(`/api/products/admin/?page=${page}&limit=${limit}`);
       return response.json();
     },
+    retry: 1,
   });
+
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this product?')) {
       mutation.mutate(id);
