@@ -53,7 +53,7 @@ const ProductPage = () => {
         },
         body: JSON.stringify({
           productId,
-          quantity: 1,
+          quantity,
           colorId: selectedColor,
         }),
       });

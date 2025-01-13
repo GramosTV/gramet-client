@@ -1,17 +1,17 @@
 'use client';
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-interface ShippingFormInputs {
+export interface ShippingFormInputs {
   fullName: string;
-  streetName: string;
+  street: string;
   houseNumber: string;
   apartmentNumber?: string;
   city: string;
-  zip: string;
+  zipCode: string;
 }
 
 interface ShippingFormProps {
-  setShippingInfo: (data: ShippingFormInputs) => void;
+  setShippingInfo: Dispatch<SetStateAction<ShippingFormInputs | undefined>>;
 }
 
 export const ShippingForm = ({ setShippingInfo }: ShippingFormProps) => {
@@ -36,8 +36,8 @@ export const ShippingForm = ({ setShippingInfo }: ShippingFormProps) => {
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className="block mb-1 font-medium">Street Name</label>
-          <input {...register('streetName', { required: 'Required' })} className="w-full border rounded px-3 py-2" />
-          {errors.streetName && <p className="text-red-500 text-sm">{errors.streetName.message}</p>}
+          <input {...register('street', { required: 'Required' })} className="w-full border rounded px-3 py-2" />
+          {errors.street && <p className="text-red-500 text-sm">{errors.street.message}</p>}
         </div>
         <div>
           <label className="block mb-1 font-medium">House Number</label>
@@ -59,13 +59,11 @@ export const ShippingForm = ({ setShippingInfo }: ShippingFormProps) => {
 
         <div>
           <label className="block mb-1 font-medium">Zip</label>
-          <input {...register('zip', { required: 'Required' })} className="w-full border rounded px-3 py-2" />
-          {errors.zip && <p className="text-red-500 text-sm">{errors.zip.message}</p>}
+          <input {...register('zipCode', { required: 'Required' })} className="w-full border rounded px-3 py-2" />
+          {errors.zipCode && <p className="text-red-500 text-sm">{errors.zipCode.message}</p>}
         </div>
       </div>
-      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-        Confirm
-      </button>
+      <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Confirm</button>
     </form>
   );
 };

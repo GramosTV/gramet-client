@@ -2,12 +2,13 @@
 import { Cart } from '@/app/common';
 import OrderSummary from '@/app/components/Checkout/OrderSummary';
 import PaymentDetails from '@/app/components/Checkout/PaymentDetails';
-import ShippingInfo from '@/app/components/Checkout/ShippingInfo';
+import ShippingInfo, { ShippingFormInputs } from '@/app/components/Checkout/ShippingInfo';
 import { fetchWithAuth } from '@/app/lib/auth-api';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
+import { useRouter } from 'next/navigation';
 enum Step {
   OrderSummary = 'Order Summary',
   ShippingInformation = 'Shipping Information',
@@ -15,7 +16,7 @@ enum Step {
   Confirmation = 'Confirmation',
 }
 
-const page = () => {
+const page: React.FC = () => {
   const [cart, setCart, removeValue] = useLocalStorage<Cart>('cart', []);
   const [step, setStep] = useState(Step.OrderSummary);
   useQuery({
@@ -28,8 +29,36 @@ const page = () => {
     },
     retry: 1,
   });
-  const [shippingInfo, setShippingInfo] = useState({});
-  const submitOrder = async () => {};
+  const mutation = useMutation({
+    mutationFn: async (formData: ShippingFormInputs) => {
+      const response = await fetchWithAuth(`/api/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update product');
+      }
+      return await response.json();
+    },
+    onSuccess: (res) => {
+      router.push(res.url);
+      //   toast.success('Product updated successfully');
+      //   router.push('/admin-panel/products/view');
+    },
+    onError: (error: any) => {
+      //   toast.error(error?.message || 'Failed to update product');
+    },
+  });
+  const [shippingInfo, setShippingInfo] = useState<ShippingFormInputs>();
+  const router = useRouter();
+  const submitOrder = async () => {
+    if (shippingInfo) {
+      mutation.mutate(shippingInfo);
+    }
+  };
   return (
     <div className="mx-auto min-h-[calc(100vh-var(--header-height))] bg-gray-100 flex justify-center items-start">
       <div className="container max-w-[1100px] pt-8">

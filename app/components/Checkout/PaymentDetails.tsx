@@ -4,9 +4,10 @@ import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useState } from 'react';
+import { ShippingFormInputs } from './ShippingInfo';
 
 interface PaymentDetailsProps {
-  submitOrder: () => void;
+  submitOrder: () => Promise<void>;
 }
 
 const PaymentDetails: React.FC<PaymentDetailsProps> = ({ submitOrder }) => {
@@ -16,26 +17,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ submitOrder }) => {
     setSelectedMethod(method);
   };
   const router = useRouter();
-  const mutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      const response = await fetchWithAuth(`/api/orders`, {
-        method: 'POST',
-        body: formData,
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update product');
-      }
-      return await response.json();
-    },
-    onSuccess: (res) => {
-      router.push(res.url);
-      //   toast.success('Product updated successfully');
-      //   router.push('/admin-panel/products/view');
-    },
-    onError: (error: any) => {
-      //   toast.error(error?.message || 'Failed to update product');
-    },
-  });
+
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Select Payment Method</h2>
@@ -66,7 +48,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ submitOrder }) => {
           </p>
         </div>
       )}
-      <button onClick={submitOrder}></button>
+      <button onClick={submitOrder}>Submit</button>
     </div>
   );
 };
