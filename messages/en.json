@@ -8,5 +8,27 @@
     "pass": "Password",
     "error-email-length": "Email must be at least 5 characters",
     "error-pass-length": "Password must be at least 6 characters"
+  },
+  "Register": {
+    "register": "Register",
+    "success": "Registered successfully",
+    "fail": "This email is taken",
+    "name": "Name",
+    "surname": "Surname",
+    "email": "Email",
+    "pass": "Password",
+    "repeat-pass": "Repeat Password",
+    "phone": "Phone Number",
+    "error-name-required": "Name required",
+    "error-surname-required": "Surname required",
+    "error-email-required": "Email required",
+    "error-pass-required": "Password required",
+    "error-repeat-pass-required": "Repeat password required",
+    "error-repeat-pass-match": "Passwords must match",
+    "error-name-length": "Name must be at least 2 characters",
+    "error-surname-length": "Surname must be at least 2 characters",
+    "error-email-length": "Email must be at least 5 characters",
+    "error-pass-length": "Password must be at least 6 characters",
+    "error-phone-length": "Phone number must be between 9 and 15 characters"
   }
 }

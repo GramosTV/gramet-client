@@ -227,7 +227,9 @@ const Header = () => {
           <Link href="/login" className="btn btn-outline">
             Login
           </Link>
-          <button className="btn btn-active btn-neutral">Register</button>
+          <Link href="/register" className="btn btn-active btn-neutral">
+            Register
+          </Link>
         </div>
       )}
     </div>

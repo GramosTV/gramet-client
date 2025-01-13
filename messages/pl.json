@@ -8,5 +8,26 @@
     "error-pass-required": "Hasło wymagane",
     "error-email-length": "Email musi mieć przynajmniej 5 znaków",
     "error-pass-length": "Hasło musi zawierać przynajmniej 6 znaków"
+  },
+  "Register": {
+    "register": "Zarejestruj się",
+    "success": "Rejestracja zakończona sukcesem",
+    "fail": "Ten adres email jest zajęty",
+    "name": "Imię",
+    "surname": "Nazwisko",
+    "pass": "Hasło",
+    "phone": "Numer telefonu",
+    "repeat-pass": "Powtórz hasło",
+    "error-name-required": "Imię jest wymagane",
+    "error-name-length": "Imię musi mieć przynajmniej 2 znaki",
+    "error-surname-required": "Nazwisko jest wymagane",
+    "error-surname-length": "Nazwisko musi mieć przynajmniej 2 znaki",
+    "error-email-required": "Email jest wymagany",
+    "error-email-length": "Email musi mieć przynajmniej 5 znaków",
+    "error-pass-required": "Hasło jest wymagane",
+    "error-pass-length": "Hasło musi zawierać przynajmniej 6 znaków",
+    "error-phone-length": "Numer telefonu musi mieć od 9 do 15 znaków",
+    "error-repeat-pass-required": "Powtórzenie hasła jest wymagane",
+    "error-repeat-pass-match": "Hasła muszą być takie same"
   }
 }
