@@ -8,15 +8,16 @@ import { Cart, Category } from '../common';
 import { useLocalStorage } from 'usehooks-ts';
 import { useQuery } from '@tanstack/react-query';
 import { fetchWithAuth } from '../lib/auth-api';
-
+import Image from 'next/image';
 const Page = () => {
   return <AuthProvider children={<Header />} />;
 };
 
 const Header = () => {
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn: authIsLoggedIn, user } = useAuth();
+  const [isLoggedIn, setIsLoggedIn] = useLocalStorage('isLoggedIn', authIsLoggedIn);
   useQuery({
-    queryKey: ['cart'],
+    queryKey: ['cart', isLoggedIn],
     queryFn: async () => {
       const response = await fetchWithAuth('/api/cart');
       const data = await response.json();
@@ -25,8 +26,8 @@ const Header = () => {
     },
     retry: 1,
   });
-  const [cart, setCart, removeValue] = useLocalStorage<Cart>('cart', []);
 
+  const [cart, setCart, removeValue] = useLocalStorage<Cart>('cart', []);
   return (
     <div className="navbar bg-base-100 h-[var(--header-height)]">
       <div className="navbar-start">
@@ -141,7 +142,7 @@ const Header = () => {
           </li>
         </ul>
       </div>
-      {isLoggedIn ? (
+      {user ? (
         <div className="navbar-end gap-2">
           <div className="dropdown dropdown-end">
             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
@@ -165,14 +166,33 @@ const Header = () => {
                 </span>
               </div>
             </div>
-            <div tabIndex={0} className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow">
+            <div tabIndex={0} className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-64 shadow">
               <div className="card-body">
                 <span className="text-lg font-bold">{cart?.reduce((sum, item) => sum + item.quantity, 0)} Items</span>
+                <ul className="menu menu-md bg-base-200 rounded-lg w-42">
+                  {cart.map((item, i) => {
+                    return (
+                      <li key={item.name + i}>
+                        <a>
+                          <Image
+                            src={`${process.env.NEXT_PUBLIC_API_URL}/products/image/${item._id}`}
+                            alt={`${item.name} image`}
+                            width={25}
+                            height={25}
+                            style={{ height: '25px' }}
+                            className="rounded-sm"
+                          />
+                          {item.name.length > 20 ? `${item.name.slice(0, 15)}...` : item.name} x{item.quantity}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
                 <span className="text-info">
                   Subtotal: ${cart?.reduce((sum, item) => sum + item.quantity * item.price, 0)}
                 </span>
                 <div className="card-actions">
-                  <button className="btn btn-primary btn-block">View cart</button>
+                  <button className="btn btn-primary btn-block">Checkout</button>
                 </div>
               </div>
             </div>
@@ -204,7 +224,9 @@ const Header = () => {
         </div>
       ) : (
         <div className="navbar-end gap-3">
-          <button className="btn btn-outline">Login</button>
+          <Link href="/login" className="btn btn-outline">
+            Login
+          </Link>
           <button className="btn btn-active btn-neutral">Register</button>
         </div>
       )}

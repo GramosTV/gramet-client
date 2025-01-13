@@ -5,6 +5,8 @@ import { fetchWithAuth, setAccessToken } from '../../lib/auth-api';
 import { useTranslations } from 'next-intl';
 import { Bounce, toast } from 'react-toastify';
 import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+import { useLocalStorage } from 'usehooks-ts';
 
 type LoginFormValues = {
   email: string;
@@ -17,6 +19,8 @@ const Login: React.FC = () => {
     formState: { errors },
   } = useForm<LoginFormValues>();
   const [pending, setPending] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useLocalStorage('isLoggedIn', false);
+  const router = useRouter();
   const onSubmit = async (data: LoginFormValues) => {
     setPending(true);
     try {
@@ -34,6 +38,8 @@ const Login: React.FC = () => {
       setAccessToken(result.accessToken);
       setPending(false);
       toast.success(t('success'));
+      setIsLoggedIn(true);
+      router.push('/');
     } catch (error) {
       setPending(false);
       toast.error(t('fail'));

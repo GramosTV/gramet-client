@@ -18,6 +18,7 @@
     "@types/js-cookie": "^3.0.6",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/react-fontawesome": "^1.6.8",
+    "@types/react-image-gallery": "^1.2.4",
     "embla-carousel": "^8.5.2",
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
@@ -33,11 +34,15 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
     "react-i18next": "^15.4.0",
+    "react-responsive-carousel": "^3.2.23",
     "react-toastify": "^11.0.2",
     "usehooks-ts": "^3.1.0"
   },
   "overrides": {
     "usehooks-ts": {
+      "react": "^19"
+    },
+    "react-image-gallery": {
       "react": "^19"
     }
   },

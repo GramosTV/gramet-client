@@ -1,16 +1,19 @@
 export interface Color {
+  _id?: string;
   name: string;
   hex: string;
   stock: number;
 }
 
 export interface Product {
+  _id: string;
   name: string;
   brand: string;
   code: string;
   colors: Color[];
   materials: string[];
   price: number;
+  category: Category;
   images: string[];
 }
 
@@ -45,8 +48,8 @@ export enum Category {
 }
 
 export interface CartItem {
+  _id: string;
   name: string;
-  image: string;
   price: number;
   colors: Color[];
   quantity: number;

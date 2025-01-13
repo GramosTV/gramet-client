@@ -9,6 +9,8 @@ import { useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useLocalStorage } from 'usehooks-ts';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 interface Res {
   products: SearchProduct[];
   pageCount: number;
@@ -23,7 +25,7 @@ interface SearchProduct {
 }
 const Store = () => {
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(15);
+  const [limit, setLimit] = useState(6);
   const [pageCount, setPageCount] = useState(0);
   const searchParams = useSearchParams();
   const category = searchParams.get('category');
@@ -37,7 +39,7 @@ const Store = () => {
       return res;
     },
   });
-
+  const router = useRouter();
   const mutation = useMutation({
     mutationFn: async (productId: string) => {
       const response = await fetchWithAuth(`/api/cart`, {
@@ -48,7 +50,7 @@ const Store = () => {
         body: JSON.stringify({
           productId,
           quantity: 1,
-          colorId: '6782d2a4596eb4c13e801e7f',
+          colorId: '',
         }),
       });
       if (!response.ok) {
@@ -65,6 +67,10 @@ const Store = () => {
     },
   });
 
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>, id: string) => {
+    e.stopPropagation();
+    mutation.mutate(id);
+  };
   return (
     <div className="min-h-[calc(100vh-var(--header-height))] bg-gray-100 p-4 flex pt-8 justify-center">
       <ul className="menu  rounded-box w-48 mr-3">
@@ -111,23 +117,46 @@ const Store = () => {
             {category ? <li className="text-xl font-[600]">{category}</li> : null}
           </ul>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-[65vh]">
-          {!isPending || !isError
-            ? data?.products.map((product) => (
-                <div className="bg-white p-4 rounded shadow" key={product._id}>
-                  <h2 className="text-xl font-semibold">{product.name}</h2>
-
-                  <p className="mt-2">
-                    {product.price} zł{' '}
-                    <FontAwesomeIcon
-                      icon={faCartPlus}
-                      className="cursor-pointer"
-                      onClick={() => mutation.mutate(product._id)}
-                    />
-                  </p>
-                </div>
-              ))
-            : null}
+        <div className="min-h-[65vh]">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {!isPending || !isError
+              ? data?.products.map((product) => (
+                  <div
+                    className="card w-full max-w-sm bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 rounded-md cursor-pointer"
+                    key={product._id}
+                  >
+                    <div
+                      className="relative w-full h-40 my-4 cursor-pointer"
+                      onClick={() => router.push(`/store/product/${product.name}`)}
+                    >
+                      <Image
+                        src={`data:image/png;base64,${product.image}`}
+                        alt={`${product.name} image`}
+                        fill
+                        className="object-contain overflow-hidden"
+                      />
+                    </div>
+                    <div className="py-4 px-6 bg-slate-200 rounded-b-md">
+                      <h2
+                        className="card-title text-lg font-bold inline-block cursor-pointer"
+                        onClick={() => router.push(`/store/product/${product.name}`)}
+                      >
+                        {product.name}
+                      </h2>
+                      <div className="flex items-center justify-between">
+                        <span className="text-md font-semibold">{product.price} zł / unit</span>
+                        <button
+                          className="btn btn-outline flex items-center gap-2"
+                          onClick={(e) => handleAddToCart(e, product._id)}
+                        >
+                          <FontAwesomeIcon icon={faCartPlus} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              : null}
+          </div>
         </div>
 
         {pageCount ? (
