@@ -32,6 +32,11 @@ const Login: React.FC = () => {
         body: JSON.stringify(data),
       });
       if (!response.ok) {
+        if (response.status === 401) {
+          toast.error('Please validate your email');
+          setPending(false);
+          return;
+        }
         throw new Error('Failed to login');
       }
       const result = await response.json();
