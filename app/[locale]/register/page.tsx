@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl';
 import { Bounce, toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
-import { useLocalStorage } from 'usehooks-ts';
 
 type RegisterFormValues = {
   name: string;
@@ -100,6 +99,7 @@ const Register: React.FC = () => {
               {...register('password', {
                 required: t('error-pass-required'),
                 minLength: { value: 6, message: t('error-pass-length') },
+                maxLength: { value: 20, message: t('error-pass-max-length') },
               })}
               type="password"
               placeholder={t('pass')}

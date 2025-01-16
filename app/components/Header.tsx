@@ -1,23 +1,41 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBasketShopping, faCartShopping, faUser } from '@fortawesome/free-solid-svg-icons';
 import { Cart, Category } from '../common';
 import { useLocalStorage } from 'usehooks-ts';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { fetchWithAuth } from '../lib/auth-api';
 import Image from 'next/image';
-const Page = () => {
-  return <AuthProvider children={<Header />} />;
-};
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 
 const Header = () => {
-  const { isLoggedIn: authIsLoggedIn, user } = useAuth();
-  const [isLoggedIn, setIsLoggedIn] = useLocalStorage('isLoggedIn', authIsLoggedIn);
+  const { user, setUser } = useAuth();
+  const router = useRouter();
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetchWithAuth(`/api/auth/logout`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update product');
+      }
+    },
+    onSuccess: () => {
+      toast.success('Successfully logged out');
+      router.push('/');
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || 'Failed to logout');
+    },
+  });
+
   useQuery({
-    queryKey: ['cart', isLoggedIn],
+    queryKey: ['cart', user],
     queryFn: async () => {
       const response = await fetchWithAuth('/api/cart');
       const data = await response.json();
@@ -26,7 +44,14 @@ const Header = () => {
     },
     retry: 1,
   });
-
+  console.log('header');
+  const logout = async () => {
+    setUser(null);
+    setCart([]);
+    await mutation.mutateAsync();
+    Cookies.remove('accessToken');
+    Cookies.remove('refreshToken');
+  };
   const [cart, setCart, removeValue] = useLocalStorage<Cart>('cart', []);
   return (
     <div className="navbar bg-base-100 h-[var(--header-height)]">
@@ -216,7 +241,7 @@ const Header = () => {
               <li>
                 <a>Settings</a>
               </li>
-              <li>
+              <li onClick={logout}>
                 <a>Logout</a>
               </li>
             </ul>
@@ -236,4 +261,4 @@ const Header = () => {
   );
 };
 
-export default Page;
+export default Header;

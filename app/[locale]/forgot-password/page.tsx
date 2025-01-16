@@ -1,33 +1,27 @@
 'use client';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { fetchWithAuth, setAccessToken } from '../../lib/auth-api';
+import { fetchWithAuth } from '../../lib/auth-api';
 import { useTranslations } from 'next-intl';
 import { Bounce, toast } from 'react-toastify';
-import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
-import { useLocalStorage } from 'usehooks-ts';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
-import * as jose from 'jose';
 
-type LoginFormValues = {
+type ForgotPasswordFormValues = {
   email: string;
-  password: string;
 };
 
-const Login: React.FC = () => {
+const Page: React.FC = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormValues>();
+  } = useForm<ForgotPasswordFormValues>();
   const [pending, setPending] = useState(false);
   const router = useRouter();
-  const { user, setUser } = useAuth();
-  const onSubmit = async (data: LoginFormValues) => {
+  const onSubmit = async (data: ForgotPasswordFormValues) => {
     setPending(true);
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,29 +29,21 @@ const Login: React.FC = () => {
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        if (response.status === 401) {
-          toast.error('Please validate your email');
-          setPending(false);
-          return;
-        }
-        throw new Error('Failed to login');
+        throw new Error('Failed to send reset password email');
       }
-      const result = await response.json();
-      setAccessToken(result.accessToken);
       setPending(false);
-      toast.success(t('success'));
-      setUser(jose.decodeJwt(result.accessToken));
+      toast.success('Reset password email sent');
       router.push('/');
     } catch (error) {
       setPending(false);
-      toast.error(t('fail'));
+      router.push('/');
     }
   };
-  const t = useTranslations('Login');
+  const t = useTranslations('ForgotPassword');
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-var(--header-height)*2)]">
       <div className="flex-grow max-w-md p-6 mx-auto bg-gray-100 rounded-md shadow-md">
-        <h1 className="mb-4 text-xl font-bold">{t('login')}</h1>
+        <h1 className="mb-4 text-xl font-bold">{t('forgotPassword')}</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Email</label>
@@ -72,25 +58,12 @@ const Login: React.FC = () => {
             />
             {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">{t('pass')}</label>
-            <input
-              {...register('password', {
-                required: t('error-pass-required'),
-                minLength: { value: 6, message: t('error-pass-length') },
-              })}
-              type="password"
-              placeholder={t('pass')}
-              className={`w-full mt-1 p-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-md`}
-            />
-            {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>}
-          </div>
 
           <button
             type="submit"
             className={'w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700' + (pending ? ' btn-off' : '')}
           >
-            {t('login')}
+            {t('sendResetLink')}
           </button>
         </form>
       </div>
@@ -98,4 +71,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Page;

@@ -1,26 +1,15 @@
-// app/[locale]/layout.tsx
-import { NextIntlClientProvider } from 'next-intl';
+// app/[locale]/layout.tsx (Server Component)
 import { notFound } from 'next/navigation';
 import { locales } from '../../i18n';
-import '../globals.css';
-import '../embla.css';
-
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import ReactQueryProvider from '../components/ReactQueryProvider';
-import Header from '../components/Header';
+import LocaleClientLayout from './LocaleClientLayout';
+
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-import { config } from '@fortawesome/fontawesome-svg-core';
-import '@fortawesome/fontawesome-svg-core/styles.css';
-import Footer from '../components/Footer';
-config.autoAddCss = false;
-
 export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: any }) {
-  const { locale } = await params;
+  const { locale } = params;
 
   let messages;
   try {
@@ -31,16 +20,9 @@ export default async function LocaleLayout({ children, params }: { children: Rea
 
   return (
     <ReactQueryProvider>
-      <html lang={locale}>
-        <body>
-          <NextIntlClientProvider locale={locale} messages={messages}>
-            <Header />
-            {children}
-            <Footer />
-          </NextIntlClientProvider>
-          <ToastContainer />
-        </body>
-      </html>
+      <LocaleClientLayout locale={locale} messages={messages}>
+        {children}
+      </LocaleClientLayout>
     </ReactQueryProvider>
   );
 }

@@ -1,14 +1,15 @@
 // context/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as jose from 'jose';
+import { useLocalStorage } from 'usehooks-ts';
+import { set } from 'react-hook-form';
 
 const AuthContext = createContext({
-  isLoggedIn: false,
   user: null as any,
+  setUser: (user: any) => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
   useEffect(() => {
     const token = document.cookie
@@ -16,20 +17,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .find((row) => row.startsWith('accessToken='))
       ?.split('=')[1];
     if (token) {
-      setIsLoggedIn(true);
       try {
+        console.log('yay');
         const decoded = jose.decodeJwt(token);
+        console.log(decoded);
         setUser(decoded);
       } catch (err) {
         console.error('Invalid token:', err);
+        setUser(null);
       }
     } else {
-      setIsLoggedIn(false);
       setUser(null);
     }
   }, []);
-
-  return <AuthContext.Provider value={{ isLoggedIn, user }}>{children}</AuthContext.Provider>;
+  console.log('rerender ', user?.sub);
+  return <AuthContext.Provider value={{ user, setUser }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);
