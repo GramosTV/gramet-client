@@ -37,14 +37,16 @@ const Header = () => {
   useQuery({
     queryKey: ['cart', user],
     queryFn: async () => {
+      if (user) {
       const response = await fetchWithAuth('/api/cart');
       const data = await response.json();
       setCart(data.itemData);
       return data;
+    }
+    return null
     },
     retry: 1,
   });
-  console.log('header');
   const logout = async () => {
     setUser(null);
     setCart([]);

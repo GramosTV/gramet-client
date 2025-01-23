@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import { useLocalStorage } from 'usehooks-ts';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { formatURL } from '@/app/lib/utils';
 interface Res {
   products: SearchProduct[];
   pageCount: number;
@@ -21,6 +22,7 @@ interface SearchProduct {
   price: number;
   public: boolean;
   image: string;
+  url: string;
   //   image: string;
 }
 const Store = () => {
@@ -127,7 +129,7 @@ const Store = () => {
                   >
                     <div
                       className="relative w-full h-40 my-4 cursor-pointer"
-                      onClick={() => router.push(`/store/product/${product.name}`)}
+                      onClick={() => router.push(`/store/product/${product.url}`)}
                     >
                       <Image
                         src={`data:image/png;base64,${product.image}`}
@@ -139,7 +141,7 @@ const Store = () => {
                     <div className="py-4 px-6 bg-slate-200 rounded-b-md">
                       <h2
                         className="card-title text-lg font-bold inline-block cursor-pointer"
-                        onClick={() => router.push(`/store/product/${product.name}`)}
+                        onClick={() => router.push(`/store/product/${product.url}`)}
                       >
                         {product.name}
                       </h2>

@@ -15,6 +15,7 @@ export interface Product {
   price: number;
   category: Category;
   images: string[];
+  url: string;
 }
 
 export enum Roles {
