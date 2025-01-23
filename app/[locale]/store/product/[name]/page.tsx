@@ -8,6 +8,8 @@ const ProductPage = async ({
 }: Readonly<{
   params: Promise<{ name: string }>;
 }>) => {
+  await new Promise((_, reject) => setTimeout(() => reject(new Error('An error occurred after 5 seconds')), 5000));
+
   const { name } = await params;
   const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/by-name/${name}`, {cache: 'force-cache'})
   const product: ProductType = await data.json()
