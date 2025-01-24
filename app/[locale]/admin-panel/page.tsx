@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import AddProducts from './products/add/page';
 import Link from 'next/link';
@@ -12,48 +13,43 @@ import {
   faShoppingBag,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
+import { useQuery } from '@tanstack/react-query';
+import { Order } from '@/app/common';
+import { fetchWithAuth } from '@/app/lib/auth-api';
+import Loading from '@/app/components/Loading';
+import NotFound from '@/app/components/NotFound';
 
 const AdminPanel = () => {
+  const { data, error, isLoading } = useQuery<Order[]>({
+    queryKey: ['ordersForAdmin'],
+    queryFn: async () => {
+      const response = await fetchWithAuth(`/api/orders/allForAdmin`);
+      return await response.json();
+    },
+    retry: 1,
+  });
+  if (isLoading) return <Loading/>;
+  if (error) return <NotFound />;
   return (
     <>
       <div className="p-6 bg-gray-200 text-black max-h-[calc(100vh-var(--header-height))] grow">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-          <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-            <div className="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
-              <FontAwesomeIcon icon={faUser} color="#000" size="2x" />
+          {[
+            { icon: faUser, count: 1257, label: 'Visitors' },
+            { icon: faShoppingBag, count: data?.length || 0, label: 'Orders' },
+            { icon: faDollar, count: 11257, label: 'Sales' },
+            { icon: faBox, count: 221, label: 'Packages to dispatch' },
+          ].map((item, index) => (
+            <div key={index} className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
+              <div className="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
+                <FontAwesomeIcon icon={item.icon} color="#000" size="2x" />
+              </div>
+              <div className="text-right">
+                <p className="text-2xl">{item.count}</p>
+                <p>{item.label}</p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-2xl">1,257</p>
-              <p>Visitors</p>
-            </div>
-          </div>
-          <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-            <div className="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
-              <FontAwesomeIcon icon={faShoppingBag} color="#000" size="2x" />
-            </div>
-            <div className="text-right">
-              <p className="text-2xl">557</p>
-              <p>Orders</p>
-            </div>
-          </div>
-          <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-            <div className="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
-              <FontAwesomeIcon icon={faDollar} color="#000" size="2x" />
-            </div>
-            <div className="text-right">
-              <p className="text-2xl">$11,257</p>
-              <p>Sales</p>
-            </div>
-          </div>
-          <div className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-            <div className="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
-              <FontAwesomeIcon icon={faBox} color="#000" size="2x" />
-            </div>
-            <div className="text-right">
-              <p className="text-2xl">221</p>
-              <p>Packages to dispatch</p>
-            </div>
-          </div>
+          ))}
         </div>
 
         <div className="mt-4 mx-4">
@@ -64,126 +60,41 @@ const AdminPanel = () => {
                   <tr className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                     <th className="px-4 py-3">Client</th>
                     <th className="px-4 py-3">Amount</th>
-                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Payment Status</th>
+                    <th className="px-4 py-3">Delivery Status</th>
                     <th className="px-4 py-3">Date</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                  <tr className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center text-sm">
-                        <div className="relative hidden w-8 h-8 mr-3 rounded-full md:block">
-                          <div className="flex justify-center items-center w-full h-full">
-                            <FontAwesomeIcon icon={faUser} size="2x" />
+                  {data?.map((order, index) => (
+                    <tr key={index} className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center text-sm">
+                          <div className="relative hidden w-8 h-8 mr-3 rounded-full md:block">
+                            <div className="flex justify-center items-center w-full h-full">
+                              <FontAwesomeIcon icon={faUser} size="2x" />
+                            </div>
+                          </div>
+                          <div>
+                            <p className="font-semibold">Client name</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">Client role</p>
                           </div>
                         </div>
-                        <div>
-                          <p className="font-semibold">Hans Burger</p>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">10x Developer</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm">$855.85</td>
-                    <td className="px-4 py-3 text-xs">
-                      <span className="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
-                        {' '}
-                        Approved{' '}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm">15-01-2021</td>
-                  </tr>
-                  <tr className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center text-sm">
-                        <div className="relative hidden w-8 h-8 mr-3 rounded-full md:block">
-                          <div className="flex justify-center items-center w-full h-full">
-                            <FontAwesomeIcon icon={faUser} size="2x" />
-                          </div>
-                        </div>
-                        <div>
-                          <p className="font-semibold">Jolina Angelie</p>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">Unemployed</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm">$369.75</td>
-                    <td className="px-4 py-3 text-xs">
-                      <span className="px-2 py-1 font-semibold leading-tight text-yellow-700 bg-yellow-100 rounded-full">
-                        {' '}
-                        Pending{' '}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm">23-03-2021</td>
-                  </tr>
-                  <tr className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center text-sm">
-                        <div className="relative hidden w-8 h-8 mr-3 rounded-full md:block">
-                          <div className="flex justify-center items-center w-full h-full">
-                            <FontAwesomeIcon icon={faUser} size="2x" />
-                          </div>
-                        </div>
-                        <div>
-                          <p className="font-semibold">Dave Li</p>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">Influencer</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm">$775.45</td>
-                    <td className="px-4 py-3 text-xs">
-                      <span className="px-2 py-1 font-semibold leading-tight text-gray-700 bg-gray-100 rounded-full dark:text-gray-100 dark:bg-gray-700">
-                        {' '}
-                        Expired{' '}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm">09-02-2021</td>
-                  </tr>
-                  <tr className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center text-sm">
-                        <div className="relative hidden w-8 h-8 mr-3 rounded-full md:block">
-                          <div className="flex justify-center items-center w-full h-full">
-                            <FontAwesomeIcon icon={faUser} size="2x" />
-                          </div>
-                        </div>
-                        <div>
-                          <p className="font-semibold">Rulia Joberts</p>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">Actress</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm">$1276.75</td>
-                    <td className="px-4 py-3 text-xs">
-                      <span className="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
-                        {' '}
-                        Approved{' '}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm">17-04-2021</td>
-                  </tr>
-                  <tr className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center text-sm">
-                        <div className="relative hidden w-8 h-8 mr-3 rounded-full md:block ">
-                          <div className="flex justify-center items-center w-full h-full">
-                            <FontAwesomeIcon icon={faUser} size="2x" />
-                          </div>
-                        </div>
-                        <div>
-                          <p className="font-semibold">Hitney Wouston</p>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">Singer</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm">$863.45</td>
-                    <td className="px-4 py-3 text-xs">
-                      <span className="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-700">
-                        {' '}
-                        Denied{' '}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm">11-01-2021</td>
-                  </tr>
+                      </td>
+                      <td className="px-4 py-3 text-sm">${order.items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}</td>
+                      <td className="px-4 py-3 text-xs">
+                        <span className={`px-2 py-1 font-semibold leading-tight rounded-full ${order.paymentStatus === 'completed' ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100' : order.paymentStatus === 'pending' ? 'text-yellow-700 bg-yellow-100' : order.paymentStatus === 'failed' ? 'text-red-700 bg-red-100 dark:text-red-100 dark:bg-red-700' : 'text-gray-700 bg-gray-100 dark:text-gray-100 dark:bg-gray-700'}`}>
+                          {order.paymentStatus}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs">
+                        <span className={`px-2 py-1 font-semibold leading-tight rounded-full ${order.deliveryStatus === 'delivered' ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100' : order.deliveryStatus === 'dispatched' ? 'text-yellow-700 bg-yellow-100' : order.deliveryStatus === 'not_dispatched' ? 'text-red-700 bg-red-100 dark:text-red-100 dark:bg-red-700' : 'text-gray-700 bg-gray-100 dark:text-gray-100 dark:bg-gray-700'}`}>
+                          {order.deliveryStatus}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm">{new Date(order.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

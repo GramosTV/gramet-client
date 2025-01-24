@@ -9,6 +9,7 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 enum Step {
   OrderSummary = 'Order Summary',
   ShippingInformation = 'Shipping Information',
@@ -24,6 +25,7 @@ const page: React.FC = () => {
     queryFn: async () => {
       const response = await fetchWithAuth('/api/cart');
       const data = await response.json();
+      console.log(data.itemData)
       setCart(data.itemData);
       return data;
     },
@@ -45,11 +47,9 @@ const page: React.FC = () => {
     },
     onSuccess: (res) => {
       router.push(res.url);
-      //   toast.success('Product updated successfully');
-      //   router.push('/admin-panel/products/view');
     },
     onError: (error: any) => {
-      //   toast.error(error?.message || 'Failed to update product');
+        toast.error('Failed to place order');
     },
   });
   const [shippingInfo, setShippingInfo] = useState<ShippingFormInputs>();
@@ -101,7 +101,7 @@ const page: React.FC = () => {
           {(() => {
             switch (step) {
               case Step.OrderSummary:
-                return <OrderSummary />;
+                return <OrderSummary products={cart}/>;
               case Step.ShippingInformation:
                 return <ShippingInfo setShippingInfo={setShippingInfo} />;
               case Step.PaymentDetails:

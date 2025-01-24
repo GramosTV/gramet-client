@@ -219,7 +219,7 @@ const Header = () => {
                   Subtotal: ${cart?.reduce((sum, item) => sum + item.quantity * item.price, 0)}
                 </span>
                 <div className="card-actions">
-                  <button className="btn btn-primary btn-block">Checkout</button>
+                  <button className="btn btn-primary btn-block" onClick={() => router.push('/checkout')}>Checkout</button>
                 </div>
               </div>
             </div>
@@ -235,10 +235,9 @@ const Header = () => {
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
             >
               <li>
-                <a className="justify-between">
-                  Profile
-                  <span className="badge">New</span>
-                </a>
+                <Link href="/orders" className="justify-between">
+                  Orders
+                </Link>
               </li>
               <li>
                 <a>Settings</a>

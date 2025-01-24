@@ -51,7 +51,7 @@ const Product = ({product}: {
       const handleBuy = () => {
         setNotif(false);
         if (product._id) mutation.mutate(product._id);
-        router.push('/store/checkout');
+        router.push('/checkout');
       };
 
       const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {

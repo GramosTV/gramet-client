@@ -28,6 +28,10 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  if (req.nextUrl.pathname.startsWith('/checkout') && !token) {
+    return NextResponse.redirect(new URL('/login', req.nextUrl.origin));
+  }
+
   // Require admin token for admin-panel
   if (req.nextUrl.pathname.startsWith('/admin-panel')) {
     if (!token) {
@@ -54,31 +58,24 @@ export async function middleware(req: NextRequest) {
               Cookie: `refreshToken=${refreshToken}`,
             },
           });
-          console.log(res);
           if (!res.ok) throw new Error();
           const data: TokenResponse = await res.json();
           const decoded = await jose.jwtVerify(data.accessToken, new TextEncoder().encode(process.env.JWT_SECRET));
           if (decoded.payload.role !== Roles.ADMIN) {
             return NextResponse.redirect(new URL('/403', req.nextUrl.origin));
           }
-          console.log('token2: ' + data.accessToken);
           const response = NextResponse.redirect(new URL(req.nextUrl.pathname, req.nextUrl.origin));
-          console.log('1');
           response.cookies.set('accessToken', data.accessToken, {
             // httpOnly: true,
             secure: true,
             sameSite: 'strict',
             path: '/',
           });
-          console.log('here');
           return response;
         } catch (error) {
-          console.log('err');
-          console.log(error);
           return NextResponse.redirect(new URL('/login', req.nextUrl.origin));
         }
       }
-      console.log('here2');
       return NextResponse.redirect(new URL('/login', req.nextUrl.origin));
     }
   }
