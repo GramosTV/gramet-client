@@ -9,7 +9,7 @@ export async function generateStaticParams() {
 }
 
 export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: any }) {
-  const { locale } = params;
+  const { locale } = await params;
 
   let messages;
   try {
