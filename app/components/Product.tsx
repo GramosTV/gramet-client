@@ -73,13 +73,13 @@ const Product = ({ product }: { product: ProductType }) => {
       setQuantity(selectedColorStock);
     }
   }, [selectedColor, product.colors, quantity]);
-
   return (
     <div className="bg-base-100 p-8 flex rounded-lg">
       <div className="flex flex-col max-w-[440px]">
         {show3DView ? (
           <ObjViewer
-            objFileUrl="/models/u.obj"
+            objBase64={`${process.env.NEXT_PUBLIC_API_URL}/products/obj/`}
+            productId={product._id}
             color={product.colors.find((color) => color._id === selectedColor)?.hex || '#dddddd'}
           />
         ) : (

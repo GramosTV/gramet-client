@@ -16,6 +16,7 @@ export interface Product {
   category: Category;
   images: string[];
   url: string;
+  obj: string;
 }
 
 export enum Roles {

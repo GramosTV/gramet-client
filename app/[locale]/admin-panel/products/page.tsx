@@ -16,7 +16,7 @@ interface AdminProduct {
   name: string;
   colors: Color[];
   public: boolean;
-  //   image: string;
+  objFile?: string; // Added optional objFile field
 }
 
 const ViewProducts = () => {

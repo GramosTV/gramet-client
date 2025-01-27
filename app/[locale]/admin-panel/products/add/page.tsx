@@ -14,6 +14,7 @@ interface ProductFormValues {
   price: number;
   images: FileList;
   public: boolean;
+  objFile?: FileList;
 }
 
 const AddProducts: React.FC = () => {
@@ -57,6 +58,11 @@ const AddProducts: React.FC = () => {
     Array.from(data.images).forEach((file) => {
       formData.append('images', file);
     });
+    if (data.objFile) {
+      Array.from(data.objFile).forEach((file) => {
+        formData.append('objFile', file);
+      });
+    }
 
     try {
       const response = await fetchWithAuth('/api/products', {
@@ -245,6 +251,20 @@ const AddProducts: React.FC = () => {
               <img key={index} src={src} alt={`Preview ${index}`} className="object-cover w-24 h-24 rounded-md" />
             ))}
           </div>
+        </div>
+
+        {/* .obj File Field */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">3D Model (.obj)</label>
+          <input
+            {...register('objFile')}
+            type="file"
+            accept=".obj"
+            className={`bg-gray-300 w-full mt-1 p-2 border ${
+              errors.objFile ? 'border-red-500' : 'border-gray-300'
+            } rounded-md`}
+          />
+          {errors.objFile && <p className="mt-1 text-sm text-red-500">{errors.objFile.message}</p>}
         </div>
 
         {/* Public Field */}

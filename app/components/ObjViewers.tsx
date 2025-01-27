@@ -17,7 +17,7 @@ const hexToBABYLONColor4 = (hex: string): BABYLON.Color4 => {
   return new BABYLON.Color4(r, g, b, 1);
 };
 
-const ObjViewer = ({ objFileUrl, color }: { objFileUrl: string; color: string }) => {
+const ObjViewer = ({ objBase64, color, productId }: { objBase64: string; color: string; productId: string }) => {
   const canvasRef = useRef(null);
   const sceneRef = useRef<BABYLON.Scene | null>(null);
 
@@ -32,27 +32,34 @@ const ObjViewer = ({ objFileUrl, color }: { objFileUrl: string; color: string })
     const backgroundColor = hexToBABYLONColor4('#ffffff');
     scene.clearColor = backgroundColor;
 
-    BABYLON.SceneLoader.Append(
-      '',
-      objFileUrl,
-      scene,
-      (scene) => {
+    BABYLON.SceneLoader.ImportMesh(
+      '', // Mesh names (empty string for all meshes)
+      objBase64,
+      `${productId}.obj`,
+      scene, // The scene to append the meshes to
+      (meshes) => {
+        // This callback is triggered after meshes are successfully loaded
         scene.createDefaultCameraOrLight(true, true, true);
+
         const materialColor = hexToBABYLONColor3(color);
-        scene.meshes.forEach((mesh) => {
+
+        // Apply transformations and materials to each mesh
+        meshes.forEach((mesh) => {
           const coloredMaterial = new BABYLON.PBRMaterial('coloredMaterial', scene);
-          coloredMaterial.roughness = 0.5; // Adjust as needed
+          coloredMaterial.roughness = 0.5;
           coloredMaterial.metallic = 0.1;
           coloredMaterial.albedoColor = materialColor;
+
           mesh.material = coloredMaterial;
           mesh.rotation = new BABYLON.Vector3(Math.PI / 2, Math.PI, Math.PI);
           mesh.scaling = new BABYLON.Vector3(1.4, 1.4, 1.4);
           mesh.position = new BABYLON.Vector3(0, -40, 0);
         });
       },
-      null,
+      null, // Progress callback (optional)
       (scene, message) => {
-        console.error('Error loading .obj file', message);
+        // Error callback
+        console.error('Error loading .obj file:', message);
       }
     );
 
@@ -67,7 +74,7 @@ const ObjViewer = ({ objFileUrl, color }: { objFileUrl: string; color: string })
     return () => {
       engine.dispose();
     };
-  }, [objFileUrl]);
+  }, [objBase64]);
 
   useEffect(() => {
     if (sceneRef.current) {
