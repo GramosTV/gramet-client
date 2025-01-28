@@ -136,54 +136,64 @@ const AddProducts: React.FC = () => {
         {/* Colors Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Colors</label>
-          <div className="space-y-4">
-            {colorFields.map((field, index) => (
-              <div key={field.id} className="flex space-x-2">
-                <input
-                  {...register(`colors.${index}.name` as const, { required: 'Color name is required' })}
-                  type="text"
-                  placeholder="Color Name"
-                  className={`w-1/3 p-2 border ${
-                    errors.colors?.[index]?.name ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md`}
-                />
-                <input
-                  {...register(`colors.${index}.hex` as const, { required: 'Hex code is required' })}
-                  type="text"
-                  placeholder="#FFFFFF"
-                  className={`w-1/3 p-2 border ${
-                    errors.colors?.[index]?.hex ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md`}
-                />
-                <input
-                  {...register(`colors.${index}.stock` as const, {
-                    required: 'Stock is required',
-                    valueAsNumber: true,
-                    min: { value: 0, message: 'Stock must be 0 or more' },
-                  })}
-                  type="number"
-                  placeholder="Stock"
-                  className={`w-1/3 p-2 border ${
-                    errors.colors?.[index]?.stock ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md`}
-                />
-                <button
-                  type="button"
-                  onClick={() => removeColor(index)}
-                  className="p-2 text-white bg-red-500 rounded-md hover:bg-red-600"
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() => addColor({ name: '', hex: '', stock: 0 })}
-              className="p-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
-            >
-              Add Color
-            </button>
+          <div className="overflow-x-auto mt-2">
+            <table className="table w-full">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Hex</th>
+                  <th>Stock</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {colorFields.map((field, index) => (
+                  <tr key={field.id}>
+                    <td>
+                      <input
+                        {...register(`colors.${index}.name` as const, { required: 'Color name is required' })}
+                        type="text"
+                        placeholder="Color Name"
+                        className={`input input-bordered w-full ${errors.colors?.[index]?.name ? 'input-error' : ''}`}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        {...register(`colors.${index}.hex` as const, { required: 'Hex code is required' })}
+                        type="text"
+                        placeholder="#FFFFFF"
+                        className={`input input-bordered w-full ${errors.colors?.[index]?.hex ? 'input-error' : ''}`}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        {...register(`colors.${index}.stock` as const, {
+                          required: 'Stock is required',
+                          valueAsNumber: true,
+                          min: { value: 0, message: 'Stock must be 0 or more' },
+                        })}
+                        type="number"
+                        placeholder="Stock"
+                        className={`input input-bordered w-full ${errors.colors?.[index]?.stock ? 'input-error' : ''}`}
+                      />
+                    </td>
+                    <td>
+                      <button type="button" onClick={() => removeColor(index)} className="btn btn-error">
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+          <button
+            type="button"
+            onClick={() => addColor({ name: '', hex: '', stock: 0 })}
+            className="mt-2 btn btn-primary"
+          >
+            Add Color
+          </button>
         </div>
 
         {/* Materials Field */}
@@ -225,8 +235,11 @@ const AddProducts: React.FC = () => {
               required: 'Price is required',
               valueAsNumber: true,
               min: { value: 0, message: 'Price must be greater than or equal to 0' },
+              validate: (value) =>
+                /^\d+(\.\d{1,2})?$/.test(value.toString()) || 'Price must have up to 2 decimal places',
             })}
             type="number"
+            step="0.01"
             placeholder="Product Price"
             className={`w-full mt-1 p-2 border ${errors.price ? 'border-red-500' : 'border-gray-300'} rounded-md`}
           />

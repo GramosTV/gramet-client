@@ -12,10 +12,13 @@ import { useLocalStorage } from 'usehooks-ts';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { formatURL } from '@/app/lib/utils';
+
 interface Res {
   products: SearchProduct[];
   pageCount: number;
+  totalCount: number;
 }
+
 interface SearchProduct {
   _id: string;
   name: string;
@@ -23,19 +26,23 @@ interface SearchProduct {
   public: boolean;
   image: string;
   url: string;
-  //   image: string;
 }
+
 const Store = () => {
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(6);
+  const [limit, setLimit] = useState(9);
   const [pageCount, setPageCount] = useState(0);
+  const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
+  const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
   const searchParams = useSearchParams();
   const category = searchParams.get('category');
   const [cart, setCart, removeValue] = useLocalStorage('cart', []);
   const { data, isPending, isError } = useQuery({
-    queryKey: ['products', page, limit, category],
+    queryKey: ['products', page, limit, category, minPrice, maxPrice],
     queryFn: async (): Promise<Res> => {
-      const response = await fetchWithAuth(`/api/products/?page=${page}&limit=${limit}&category=${category}`);
+      const response = await fetchWithAuth(
+        `/api/products/?page=${page}&limit=${limit}&category=${category}&minPrice=${minPrice}&maxPrice=${maxPrice}`
+      );
       const res = await response.json();
       setPageCount(res?.pageCount);
       return res;
@@ -73,9 +80,46 @@ const Store = () => {
     e.stopPropagation();
     mutation.mutate(id);
   };
+
+  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    let newMin: number | undefined;
+    if (rawValue === '') {
+      newMin = undefined;
+    } else {
+      newMin = parseFloat(rawValue);
+      if (isNaN(newMin)) return;
+      newMin = Math.max(newMin, 0);
+    }
+    setMinPrice(newMin);
+    if (newMin !== undefined) {
+      if (maxPrice !== undefined && newMin > maxPrice) {
+        setMaxPrice(newMin);
+      }
+    }
+  };
+
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    let newMax: number | undefined;
+    if (rawValue === '') {
+      newMax = undefined;
+    } else {
+      newMax = parseFloat(rawValue);
+      if (isNaN(newMax)) return;
+      newMax = Math.max(newMax, 0);
+    }
+    setMaxPrice(newMax);
+    if (newMax !== undefined) {
+      if (minPrice !== undefined && newMax < minPrice) {
+        setMinPrice(newMax);
+      }
+    }
+  };
+
   return (
     <div className="min-h-[calc(100vh-var(--header-height))] bg-gray-100 p-4 flex pt-8 justify-center">
-      <ul className="menu  rounded-box w-48 mr-3">
+      <ul className="menu  rounded-box w-60 mr-3">
         <li className="menu-title">Categories</li>
         <li>
           <Link href={`/store`}>All</Link>
@@ -107,9 +151,31 @@ const Store = () => {
         <li>
           <Link href={`/store/?category=${Category.DRAWERS}`}>Drawers</Link>
         </li>
+        <li className="menu-title mt-2">Price Range</li>
+        <li className="menu-title p-0">
+          <div className="flex flex-row items-center space-x-2 p-2 !bg-transparent">
+            <input
+              type="number"
+              placeholder="Min"
+              className="input input-bordered w-20"
+              id="minPrice"
+              value={minPrice ?? ''}
+              onChange={handleMinPriceChange}
+            />
+            <span>-</span>
+            <input
+              type="number"
+              placeholder="Max"
+              className="input input-bordered w-20"
+              id="maxPrice"
+              value={maxPrice ?? ''}
+              onChange={handleMaxPriceChange}
+            />
+          </div>
+        </li>
       </ul>
       <div className="container max-w-[1100px]">
-        <div className="breadcrumbs text-sm mb-3">
+        <div className="breadcrumbs text-sm mb-3 flex justify-between items-end">
           <ul>
             <li>
               <Link href="/store" className="text-xl font-[700]">
@@ -118,6 +184,7 @@ const Store = () => {
             </li>
             {category ? <li className="text-xl font-[600]">{category}</li> : null}
           </ul>
+          {data?.totalCount ? <span className="opacity-50 text-base">Results: {data?.totalCount}</span> : null}
         </div>
         <div className="min-h-[65vh]">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -138,15 +205,17 @@ const Store = () => {
                         className="object-contain overflow-hidden"
                       />
                     </div>
-                    <div className="py-4 px-6 bg-slate-200 rounded-b-md">
-                      <h2
-                        className="card-title text-lg font-bold inline-block cursor-pointer"
-                        onClick={() => router.push(`/store/product/${product.url}`)}
-                      >
-                        {product.name}
-                      </h2>
+                    <div className="py-4 px-6 rounded-b-md">
                       <div className="flex items-center justify-between">
-                        <span className="text-md font-semibold">{product.price} zł / unit</span>
+                        <div className="flex justify-between flex-col">
+                          <h2
+                            className="card-title text-lg font-bold inline-block cursor-pointer"
+                            onClick={() => router.push(`/store/product/${product.url}`)}
+                          >
+                            {product.name}
+                          </h2>
+                          <span className="text-md">{product.price} zł / unit</span>
+                        </div>
                         <button
                           className="btn btn-outline flex items-center gap-2"
                           onClick={(e) => handleAddToCart(e, product._id)}
@@ -166,7 +235,10 @@ const Store = () => {
             <div className="join">
               <button
                 className="join-item btn"
-                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                onClick={() => {
+                  setPage((prev) => Math.max(prev - 1, 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 disabled={page === 1}
               >
                 Previous
@@ -175,14 +247,20 @@ const Store = () => {
                 <button
                   key={i + 1}
                   className={`join-item btn ${page === i + 1 ? 'btn-active' : ''}`}
-                  onClick={() => setPage(i + 1)}
+                  onClick={() => {
+                    setPage(i + 1);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                 >
                   {i + 1}
                 </button>
               ))}
               <button
                 className="join-item btn"
-                onClick={() => setPage((prev) => Math.min(prev + 1, pageCount || 1))}
+                onClick={() => {
+                  setPage((prev) => Math.min(prev + 1, pageCount || 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 disabled={page === pageCount}
               >
                 Next
