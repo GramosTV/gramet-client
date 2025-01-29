@@ -27,7 +27,7 @@ export default function LocaleClientLayout({
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages} timeZone={'Europe/Vienna'}>
           <AuthProvider>
             <Header />
             {children}

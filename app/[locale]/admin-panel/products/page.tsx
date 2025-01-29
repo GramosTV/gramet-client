@@ -52,7 +52,7 @@ const ViewProducts = () => {
     onSuccess: () => {
       toast.success('Product deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['products'] });
-      router.push('/admin-panel/products/view');
+      router.push('/admin-panel/products');
     },
     onError: (error: any) => {
       toast.error(error?.message || 'Failed to delete product');

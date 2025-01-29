@@ -15,7 +15,7 @@ enum Step {
 }
 
 const page: React.FC = () => {
-  const {orderId} = useParams();
+  const { orderId } = useParams();
   const [step, setStep] = useState(Step.Confirmation);
   const { data, error, isLoading } = useQuery<Order>({
     queryKey: ['order', orderId],
@@ -28,7 +28,7 @@ const page: React.FC = () => {
   const router = useRouter();
   return (
     <div className="mx-auto min-h-[calc(100vh-var(--header-height))] bg-gray-100 flex justify-center items-start">
-      <div className="container max-w-[1100px] pt-8">
+      <div className="container max-w-[1200px] pt-8">
         <div className="breadcrumbs text-sm mb-3">
           <ul>
             <li>
@@ -66,13 +66,7 @@ const page: React.FC = () => {
             </li>
           </ul>
           <div className="p-4 bg-white shadow-sm rounded-md w-full max-w-xl mx-auto flex">
-              {isLoading ? (
-                <p>Loading...</p>
-              ) : error ? (
-                <p>Error loading order details</p>
-              ) : (
-                <p>{JSON.stringify(data)}</p>
-              )}
+            {isLoading ? <p>Loading...</p> : error ? <p>Error loading order details</p> : <p>{JSON.stringify(data)}</p>}
           </div>
         </div>
       </div>

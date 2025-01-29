@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 
 interface ProductFormValues {
   name: string;
+  enName: string;
   brand: string;
   code: string;
   colors: Color[];
@@ -50,6 +51,7 @@ const EditProduct: React.FC = () => {
       const response = await fetchWithAuth(`/api/products/byId/${id}`);
       const product = await response.json();
       setValue('name', product.name);
+      setValue('enName', product.enName);
       setValue('brand', product.brand);
       setValue('code', product.code);
       setValue('colors', product.colors);
@@ -90,6 +92,7 @@ const EditProduct: React.FC = () => {
   const onSubmit = async (data: ProductFormValues) => {
     const formData = new FormData();
     formData.append('name', data.name);
+    formData.append('enName', data.enName);
     formData.append('brand', data.brand);
     formData.append('code', data.code);
     formData.append('price', data.price.toString());
@@ -128,39 +131,54 @@ const EditProduct: React.FC = () => {
       <h1 className="mb-4 text-xl font-bold">Edit Product</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Name Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Name</label>
-          <input
-            {...register('name', { required: 'Name is required' })}
-            type="text"
-            placeholder="Product Name"
-            className={`w-full mt-1 p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md`}
-          />
-          {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>}
-        </div>
+        <div className="flex justify-between">
+          <div className="w-[48%]">
+            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <input
+              {...register('name', { required: 'Name is required' })}
+              type="text"
+              placeholder="Product Name"
+              className={`w-full mt-1 p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+            />
+            {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>}
+          </div>
 
-        {/* Brand Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Brand</label>
-          <input
-            {...register('brand', { required: 'Brand is required' })}
-            type="text"
-            placeholder="Product Brand"
-            className={`w-full mt-1 p-2 border ${errors.brand ? 'border-red-500' : 'border-gray-300'} rounded-md`}
-          />
-          {errors.brand && <p className="mt-1 text-sm text-red-500">{errors.brand.message}</p>}
+          {/* English Name Field */}
+          <div className="w-[48%]">
+            <label className="block text-sm font-medium text-gray-700">English Name</label>
+            <input
+              {...register('enName', { required: 'English Name is required' })}
+              type="text"
+              placeholder="Product English Name"
+              className={`w-full mt-1 p-2 border ${errors.enName ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+            />
+            {errors.enName && <p className="mt-1 text-sm text-red-500">{errors.enName.message}</p>}
+          </div>
         </div>
+        <div className="flex justify-between">
+          {/* Brand Field */}
+          <div className="w-[48%]">
+            <label className="block text-sm font-medium text-gray-700">Brand</label>
+            <input
+              {...register('brand', { required: 'Brand is required' })}
+              type="text"
+              placeholder="Product Brand"
+              className={`w-full mt-1 p-2 border ${errors.brand ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+            />
+            {errors.brand && <p className="mt-1 text-sm text-red-500">{errors.brand.message}</p>}
+          </div>
 
-        {/* Code Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Code</label>
-          <input
-            {...register('code', { required: 'Code is required' })}
-            type="text"
-            placeholder="Product Code"
-            className={`w-full mt-1 p-2 border ${errors.code ? 'border-red-500' : 'border-gray-300'} rounded-md`}
-          />
-          {errors.code && <p className="mt-1 text-sm text-red-500">{errors.code.message}</p>}
+          {/* Code Field */}
+          <div className="w-[48%]">
+            <label className="block text-sm font-medium text-gray-700">Code</label>
+            <input
+              {...register('code', { required: 'Code is required' })}
+              type="text"
+              placeholder="Product Code"
+              className={`w-full mt-1 p-2 border ${errors.code ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+            />
+            {errors.code && <p className="mt-1 text-sm text-red-500">{errors.code.message}</p>}
+          </div>
         </div>
 
         {/* Category Field */}

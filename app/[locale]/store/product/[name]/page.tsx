@@ -3,6 +3,8 @@ import Head from 'next/head';
 import Product from '@/app/components/Product';
 import { Product as ProductType } from '@/app/common';
 import { Metadata, ResolvingMetadata } from 'next';
+import { useTranslations } from 'next-intl';
+import { getLocale } from 'next-intl/server';
 type Props = {
   params: Promise<{ name: string }>;
 };
@@ -32,14 +34,15 @@ const ProductPage = async ({
 }>) => {
   //TESTING
   // await new Promise((_, reject) => setTimeout(() => reject(new Error('An error occurred after 5 seconds')), 5000));
-
+  const locale = await getLocale();
   const { name } = await params;
   const product: ProductType = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/by-name/${name}`, {
     cache: 'force-cache',
   }).then((res) => res.json());
+
   return (
-    <div className="mx-auto min-h-[calc(100vh-var(--header-height))] bg-gray-100 flex justify-center items-start">
-      <div className="container max-w-[1100px] pt-8">
+    <div className="mx-auto min-h-[calc(100vh-var(--header-height))]  flex justify-center items-start">
+      <div className="container max-w-[1200px] pt-8">
         <div className="breadcrumbs text-sm mb-3">
           <ul>
             <li>
@@ -50,7 +53,7 @@ const ProductPage = async ({
             <li className="text-xl font-[600]">
               <Link href={`/store/?category=${product.category}`}>{product.category}</Link>
             </li>
-            <li className="text-xl">{product.name}</li>
+            <li className="text-xl">{locale === 'pl' ? product.name : product.enName}</li>
           </ul>
         </div>
         <Product product={product} />

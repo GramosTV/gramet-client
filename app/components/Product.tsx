@@ -11,8 +11,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import { Carousel } from 'react-responsive-carousel';
 import ObjViewer from './ObjViewers';
+import { useAuth } from '@/context/AuthContext';
 
 const Product = ({ product }: { product: ProductType }) => {
+  const { user } = useAuth();
   const [cart, setCart, removeValue] = useLocalStorage('cart', []);
   const [notif, setNotif] = useState(true);
   const router = useRouter();
@@ -47,12 +49,12 @@ const Product = ({ product }: { product: ProductType }) => {
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     setNotif(true);
     e.stopPropagation();
-    if (product._id) mutation.mutate(product._id);
+    if (product._id) user ? mutation.mutate(product._id) : router.push('/login');
   };
 
   const handleBuy = () => {
     setNotif(false);
-    if (product._id) mutation.mutate(product._id);
+    if (product._id) user ? mutation.mutate(product._id) : router.push('/login');
     router.push('/checkout');
   };
 

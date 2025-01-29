@@ -1,12 +1,12 @@
-import '../styles/loading.css'
+import '../styles/loading.css';
 const Loading = () => {
   return (
-    <div className='mx-auto min-h-[calc(100vh-var(--header-height))] bg-gray-100 flex justify-center items-center'>
+    <div className="mx-auto min-h-[calc(100vh-var(--header-height))] flex justify-center items-center">
       <div className="transform scale-125">
-    <div className="hourglass"></div>
+        <div className="hourglass"></div>
+      </div>
     </div>
-    </div>
-  )
-}
+  );
+};
 
-export default Loading
+export default Loading;

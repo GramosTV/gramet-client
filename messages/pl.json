@@ -1,4 +1,5 @@
 {
+  "locale": "pl",
   "Login": {
     "login": "Zaloguj się",
     "success": "Zalogowano pomyślnie",
@@ -28,6 +29,7 @@
     "error-pass-length": "Hasło musi zawierać przynajmniej 6 znaków",
     "error-phone-length": "Numer telefonu musi mieć od 9 do 15 znaków",
     "error-repeat-pass-required": "Powtórzenie hasła jest wymagane",
-    "error-repeat-pass-match": "Hasła muszą być takie same"
+    "error-repeat-pass-match": "Hasła muszą być takie same",
+    "error-pass-max-length": "Hasło musi mieć maksymalnie 20 znaków"
   }
 }

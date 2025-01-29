@@ -95,7 +95,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       <Link href="/admin-panel/products/add" className="mx-8">
         Add Products
       </Link>
-      <Link href="/admin-panel/products/view" className="mx-8">
+      <Link href="/admin-panel/products" className="mx-8">
         View Products
       </Link>
       <Link href="/admin-panel/products/edit" className="mx-8">

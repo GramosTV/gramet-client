@@ -25,7 +25,7 @@ const page: React.FC = () => {
     queryFn: async () => {
       const response = await fetchWithAuth('/api/cart');
       const data = await response.json();
-      console.log(data.itemData)
+      console.log(data.itemData);
       setCart(data.itemData);
       return data;
     },
@@ -49,7 +49,7 @@ const page: React.FC = () => {
       router.push(res.url);
     },
     onError: (error: any) => {
-        toast.error('Failed to place order');
+      toast.error('Failed to place order');
     },
   });
   const [shippingInfo, setShippingInfo] = useState<ShippingFormInputs>();
@@ -61,7 +61,7 @@ const page: React.FC = () => {
   };
   return (
     <div className="mx-auto min-h-[calc(100vh-var(--header-height))] bg-gray-100 flex justify-center items-start">
-      <div className="container max-w-[1100px] pt-8">
+      <div className="container max-w-[1200px] pt-8">
         <div className="breadcrumbs text-sm mb-3">
           <ul>
             <li>
@@ -101,7 +101,7 @@ const page: React.FC = () => {
           {(() => {
             switch (step) {
               case Step.OrderSummary:
-                return <OrderSummary products={cart}/>;
+                return <OrderSummary products={cart} />;
               case Step.ShippingInformation:
                 return <ShippingInfo setShippingInfo={setShippingInfo} />;
               case Step.PaymentDetails:

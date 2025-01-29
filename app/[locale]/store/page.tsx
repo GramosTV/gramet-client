@@ -1,5 +1,5 @@
 'use client';
-import { Cart, Category, Color } from '@/app/common';
+import { Cart, Category, Color, SearchProductRes } from '@/app/common';
 import { fetchWithAuth } from '@/app/lib/auth-api';
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,23 +12,11 @@ import { useLocalStorage } from 'usehooks-ts';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { formatURL } from '@/app/lib/utils';
-
-interface Res {
-  products: SearchProduct[];
-  pageCount: number;
-  totalCount: number;
-}
-
-interface SearchProduct {
-  _id: string;
-  name: string;
-  price: number;
-  public: boolean;
-  image: string;
-  url: string;
-}
+import { useTranslations } from 'next-intl';
+import { useAuth } from '@/context/AuthContext';
 
 const Store = () => {
+  const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(9);
   const [pageCount, setPageCount] = useState(0);
@@ -39,7 +27,7 @@ const Store = () => {
   const [cart, setCart, removeValue] = useLocalStorage('cart', []);
   const { data, isPending, isError } = useQuery({
     queryKey: ['products', page, limit, category, minPrice, maxPrice],
-    queryFn: async (): Promise<Res> => {
+    queryFn: async (): Promise<SearchProductRes> => {
       const response = await fetchWithAuth(
         `/api/products/?page=${page}&limit=${limit}&category=${category}&minPrice=${minPrice}&maxPrice=${maxPrice}`
       );
@@ -78,7 +66,7 @@ const Store = () => {
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>, id: string) => {
     e.stopPropagation();
-    mutation.mutate(id);
+    user ? mutation.mutate(id) : router.push('/login');
   };
 
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,9 +105,12 @@ const Store = () => {
     }
   };
 
+  const t = useTranslations();
+  const locale = t('locale');
+
   return (
-    <div className="min-h-[calc(100vh-var(--header-height))] bg-gray-100 p-4 flex pt-8 justify-center">
-      <ul className="menu  rounded-box w-60 mr-3">
+    <div className="min-h-[calc(100vh-var(--header-height))] p-4 flex pt-8 justify-center">
+      <ul className="menu rounded-box mr-8 w-48 px-0">
         <li className="menu-title">Categories</li>
         <li>
           <Link href={`/store`}>All</Link>
@@ -151,13 +142,13 @@ const Store = () => {
         <li>
           <Link href={`/store/?category=${Category.DRAWERS}`}>Drawers</Link>
         </li>
-        <li className="menu-title mt-2">Price Range</li>
-        <li className="menu-title p-0">
-          <div className="flex flex-row items-center space-x-2 p-2 !bg-transparent">
+        <li className="menu-title mt-2 ">Price Range</li>
+        <li className="menu-title py-1">
+          <div className="flex flex-row items-center space-x-2 !bg-transparent">
             <input
               type="number"
               placeholder="Min"
-              className="input input-bordered w-20"
+              className="input input-bordered w-16 h-10"
               id="minPrice"
               value={minPrice ?? ''}
               onChange={handleMinPriceChange}
@@ -166,7 +157,7 @@ const Store = () => {
             <input
               type="number"
               placeholder="Max"
-              className="input input-bordered w-20"
+              className="input input-bordered w-16 h-10"
               id="maxPrice"
               value={maxPrice ?? ''}
               onChange={handleMaxPriceChange}
@@ -174,7 +165,7 @@ const Store = () => {
           </div>
         </li>
       </ul>
-      <div className="container max-w-[1100px]">
+      <div className="container max-w-[976px]">
         <div className="breadcrumbs text-sm mb-3 flex justify-between items-end">
           <ul>
             <li>
@@ -205,19 +196,19 @@ const Store = () => {
                         className="object-contain overflow-hidden"
                       />
                     </div>
-                    <div className="py-4 px-6 rounded-b-md">
+                    <div className="p-5 pt-0 rounded-b-md">
                       <div className="flex items-center justify-between">
                         <div className="flex justify-between flex-col">
                           <h2
-                            className="card-title text-lg font-bold inline-block cursor-pointer"
+                            className="card-title text-base font-bold inline-block cursor-pointer"
                             onClick={() => router.push(`/store/product/${product.url}`)}
                           >
-                            {product.name}
+                            {locale === 'pl' ? product.name : product.enName}
                           </h2>
-                          <span className="text-md">{product.price} zł / unit</span>
+                          <span className="text-sm">{product.price} zł / unit</span>
                         </div>
                         <button
-                          className="btn btn-outline flex items-center gap-2"
+                          className="btn btn-outline flex items-center gap-2 hover:bg-blue-700 min-h-0 h-auto p-3 rounded-xl"
                           onClick={(e) => handleAddToCart(e, product._id)}
                         >
                           <FontAwesomeIcon icon={faCartPlus} />
