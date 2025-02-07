@@ -8,13 +8,14 @@ import {
   faArrowLeft,
   faArrowRight,
   faBox,
+  faBoxesStacked,
   faDollar,
   faMoneyBill,
   faShoppingBag,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { useQuery } from '@tanstack/react-query';
-import { Order } from '@/app/common';
+import { DeliveryStatus, Order, PaymentStatus } from '@/app/common';
 import { fetchWithAuth } from '@/app/lib/auth-api';
 import Loading from '@/app/components/Loading';
 import NotFound from '@/app/components/NotFound';
@@ -28,19 +29,51 @@ const AdminPanel = () => {
     },
     retry: 1,
   });
-  if (isLoading) return <Loading/>;
+  if (isLoading) return <Loading />;
   if (error) return <NotFound />;
   return (
     <>
       <div className="p-6 bg-gray-200 text-black max-h-[calc(100vh-var(--header-height))] grow">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
           {[
-            { icon: faUser, count: 1257, label: 'Visitors' },
+            {
+              icon: faBoxesStacked,
+              count: data
+                ? data.reduce(
+                    (acc, order) => acc + order.items.reduce((orderAcc, item) => orderAcc + item.quantity, 0),
+                    0
+                  )
+                : '0',
+              label: 'Products sold',
+            },
             { icon: faShoppingBag, count: data?.length || 0, label: 'Orders' },
-            { icon: faDollar, count: 11257, label: 'Sales' },
-            { icon: faBox, count: 221, label: 'Packages to dispatch' },
+            {
+              icon: faDollar,
+              count: data
+                ? data
+                    .reduce(
+                      (acc, order) =>
+                        acc +
+                        order.items.reduce(
+                          (orderAcc, item) => orderAcc + (item?.priceAtTimeOfOrder || 0) * item.quantity,
+                          0
+                        ),
+                      0
+                    )
+                    .toFixed(2)
+                : '0.00',
+              label: 'Sales',
+            },
+            {
+              icon: faBox,
+              count: data?.filter((order) => order.deliveryStatus === DeliveryStatus.NOT_DISPATCHED).length || 0,
+              label: 'Packages to dispatch',
+            },
           ].map((item, index) => (
-            <div key={index} className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
+            <div
+              key={index}
+              className="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group"
+            >
               <div className="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
                 <FontAwesomeIcon icon={item.icon} color="#000" size="2x" />
               </div>
@@ -67,7 +100,10 @@ const AdminPanel = () => {
                 </thead>
                 <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                   {data?.map((order, index) => (
-                    <tr key={index} className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
+                    <tr
+                      key={index}
+                      className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400"
+                    >
                       <td className="px-4 py-3">
                         <div className="flex items-center text-sm">
                           <div className="relative hidden w-8 h-8 mr-3 rounded-full md:block">
@@ -76,19 +112,42 @@ const AdminPanel = () => {
                             </div>
                           </div>
                           <div>
-                            <p className="font-semibold">Client name</p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">Client role</p>
+                            <p className="font-semibold">{order.fullName}</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">{order.city}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm">${order.items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}</td>
+                      <td className="px-4 py-3 text-sm">
+                        $
+                        {order.items
+                          .reduce((total, item) => total + (item?.priceAtTimeOfOrder || 0) * item.quantity, 0)
+                          .toFixed(2)}
+                      </td>
                       <td className="px-4 py-3 text-xs">
-                        <span className={`px-2 py-1 font-semibold leading-tight rounded-full ${order.paymentStatus === 'completed' ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100' : order.paymentStatus === 'pending' ? 'text-yellow-700 bg-yellow-100' : order.paymentStatus === 'failed' ? 'text-red-700 bg-red-100 dark:text-red-100 dark:bg-red-700' : 'text-gray-700 bg-gray-100 dark:text-gray-100 dark:bg-gray-700'}`}>
+                        <span
+                          className={`px-2 py-1 font-semibold leading-tight rounded-full ${
+                            order.paymentStatus === PaymentStatus.COMPLETED
+                              ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100'
+                              : order.paymentStatus === PaymentStatus.PENDING
+                              ? 'text-yellow-700 bg-yellow-100'
+                              : order.paymentStatus === PaymentStatus.CANCELED
+                              ? 'text-red-700 bg-red-100 dark:text-red-100 dark:bg-red-700'
+                              : 'text-gray-700 bg-gray-100 dark:text-gray-100 dark:bg-gray-700'
+                          }`}
+                        >
                           {order.paymentStatus}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs">
-                        <span className={`px-2 py-1 font-semibold leading-tight rounded-full ${order.deliveryStatus === 'delivered' ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100' : order.deliveryStatus === 'dispatched' ? 'text-yellow-700 bg-yellow-100' : order.deliveryStatus === 'not_dispatched' ? 'text-red-700 bg-red-100 dark:text-red-100 dark:bg-red-700' : 'text-gray-700 bg-gray-100 dark:text-gray-100 dark:bg-gray-700'}`}>
+                        <span
+                          className={`px-2 py-1 font-semibold leading-tight rounded-full ${
+                            order.deliveryStatus === DeliveryStatus.DISPATCHED
+                              ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100'
+                              : order.deliveryStatus === DeliveryStatus.NOT_DISPATCHED
+                              ? 'text-red-700 bg-red-100 dark:text-red-100 dark:bg-red-700'
+                              : 'text-gray-700 bg-gray-100 dark:text-gray-100 dark:bg-gray-700'
+                          }`}
+                        >
                           {order.deliveryStatus}
                         </span>
                       </td>

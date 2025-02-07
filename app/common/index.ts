@@ -78,20 +78,20 @@ export interface CartItem {
   productId: string;
   colors: Color[];
   quantity: number;
+  priceAtTimeOfOrder?: number;
 }
 
 export type Cart = CartItem[];
 
 export enum PaymentStatus {
-  PENDING = 'pending',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  CANCELED = 'CANCELED',
 }
 
 export enum DeliveryStatus {
-  NOT_DISPATCHED = 'not_dispatched',
-  DISPATCHED = 'dispatched',
-  DELIVERED = 'delivered',
+  NOT_DISPATCHED = 'NOT_DISPATCHED',
+  DISPATCHED = 'DISPATCHED',
 }
 
 export interface Order {
