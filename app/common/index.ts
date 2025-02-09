@@ -78,7 +78,12 @@ export interface CartItem {
   productId: string;
   colors: Color[];
   quantity: number;
-  priceAtTimeOfOrder?: number;
+}
+
+export interface CartItemForOrder extends CartItem {
+  priceAtTimeOfOrder: number;
+  product: Product;
+  colorId: string;
 }
 
 export type Cart = CartItem[];
@@ -95,6 +100,7 @@ export enum DeliveryStatus {
 }
 
 export interface Order {
+  _id: string;
   userId: string;
   transactionId: string;
   paymentStatus: PaymentStatus;
@@ -105,7 +111,7 @@ export interface Order {
   apartmentNumber?: string;
   city: string;
   zipCode: string;
-  items: CartItem[];
+  items: CartItemForOrder[];
   createdAt: Date;
 }
 

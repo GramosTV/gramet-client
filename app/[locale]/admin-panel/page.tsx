@@ -1,8 +1,5 @@
 'use client';
-import React from 'react';
-import AddProducts from './products/add/page';
-import Link from 'next/link';
-import AdminLayout from './layout';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faArrowLeft,
@@ -10,7 +7,6 @@ import {
   faBox,
   faBoxesStacked,
   faDollar,
-  faMoneyBill,
   faShoppingBag,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
@@ -19,18 +15,53 @@ import { DeliveryStatus, Order, PaymentStatus } from '@/app/common';
 import { fetchWithAuth } from '@/app/lib/auth-api';
 import Loading from '@/app/components/Loading';
 import NotFound from '@/app/components/NotFound';
-
+import { useRouter } from 'next/navigation';
+interface Statistics {
+  totalOrders: number;
+  totalProductsSold: number;
+  totalSales: number;
+  awaitingDispatchCount: number;
+}
 const AdminPanel = () => {
+  const [pageCount, setPageCount] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
+  const [statistics, setStatistics] = useState<Statistics>({
+    totalOrders: 0,
+    totalProductsSold: 0,
+    totalSales: 0,
+    awaitingDispatchCount: 0,
+  });
   const { data, error, isLoading } = useQuery<Order[]>({
-    queryKey: ['ordersForAdmin'],
+    queryKey: ['ordersForAdmin', currentPage],
     queryFn: async () => {
-      const response = await fetchWithAuth(`/api/orders/allForAdmin`);
-      return await response.json();
+      const { orders, pageCount } = await fetchWithAuth(`/api/orders/forAdmin/?page=${currentPage}&limit=12`).then(
+        (res) => res.json()
+      );
+      setPageCount(pageCount);
+      return orders;
     },
     retry: 1,
   });
+  useQuery<Statistics>({
+    queryKey: ['ordersStatistics'],
+    queryFn: async () => {
+      const { totalOrders, totalProductsSold, totalSales, awaitingDispatchCount } = await fetchWithAuth(
+        '/api/orders/statistics'
+      ).then((res) => res.json());
+      setStatistics({ totalOrders, totalProductsSold, totalSales, awaitingDispatchCount });
+      return { totalOrders, totalProductsSold, totalSales, awaitingDispatchCount };
+    },
+    retry: 1,
+  });
+  const itemsPerPage = 12;
+  const startItem = (currentPage - 1) * itemsPerPage + 1;
+  const endItem = startItem + (data?.length || 0) - 1;
+  const totalItems = pageCount * itemsPerPage;
+
   if (isLoading) return <Loading />;
   if (error) return <NotFound />;
+
   return (
     <>
       <div className="p-6 bg-gray-200 text-black max-h-[calc(100vh-var(--header-height))] grow">
@@ -38,35 +69,18 @@ const AdminPanel = () => {
           {[
             {
               icon: faBoxesStacked,
-              count: data
-                ? data.reduce(
-                    (acc, order) => acc + order.items.reduce((orderAcc, item) => orderAcc + item.quantity, 0),
-                    0
-                  )
-                : '0',
+              count: statistics.totalOrders,
               label: 'Products sold',
             },
-            { icon: faShoppingBag, count: data?.length || 0, label: 'Orders' },
+            { icon: faShoppingBag, count: statistics.totalOrders || 0, label: 'Orders' },
             {
               icon: faDollar,
-              count: data
-                ? data
-                    .reduce(
-                      (acc, order) =>
-                        acc +
-                        order.items.reduce(
-                          (orderAcc, item) => orderAcc + (item?.priceAtTimeOfOrder || 0) * item.quantity,
-                          0
-                        ),
-                      0
-                    )
-                    .toFixed(2)
-                : '0.00',
+              count: '$' + statistics.totalSales,
               label: 'Sales',
             },
             {
               icon: faBox,
-              count: data?.filter((order) => order.deliveryStatus === DeliveryStatus.NOT_DISPATCHED).length || 0,
+              count: statistics.awaitingDispatchCount,
               label: 'Packages to dispatch',
             },
           ].map((item, index) => (
@@ -102,7 +116,8 @@ const AdminPanel = () => {
                   {data?.map((order, index) => (
                     <tr
                       key={index}
-                      className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400"
+                      className="cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400"
+                      onClick={() => router.push(`/admin-panel/order/${order._id}`)}
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center text-sm">
@@ -158,7 +173,9 @@ const AdminPanel = () => {
               </table>
             </div>
             <div className="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
-              <span className="flex items-center col-span-3"> Showing 21-30 of 100 </span>
+              <span className="flex items-center col-span-3">
+                Showing {startItem}-{endItem} of {totalItems}
+              </span>
               <span className="col-span-2"></span>
 
               <span className="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
@@ -166,39 +183,41 @@ const AdminPanel = () => {
                   <ul className="inline-flex items-center">
                     <li>
                       <button
+                        onClick={() => {
+                          if (currentPage > 1) setCurrentPage(currentPage - 1);
+                        }}
                         className="px-3 py-1 rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple"
                         aria-label="Previous"
+                        disabled={currentPage === 1}
                       >
                         <FontAwesomeIcon icon={faArrowLeft} />
                       </button>
                     </li>
-                    <li>
-                      <button className="px-3 py-1 text-white dark:text-gray-800 transition-colors duration-150 bg-blue-600 dark:bg-gray-100 border border-r-0 border-blue-600 dark:border-gray-100 rounded-md focus:outline-none focus:shadow-outline-purple">
-                        1
-                      </button>
-                    </li>
-                    <li>
-                      <button className="px-3 py-1 rounded-md focus:outline-none focus:shadow-outline-purple">2</button>
-                    </li>
-                    <li>
-                      <button className="px-3 py-1 rounded-md focus:outline-none focus:shadow-outline-purple">3</button>
-                    </li>
-                    <li>
-                      <button className="px-3 py-1 rounded-md focus:outline-none focus:shadow-outline-purple">4</button>
-                    </li>
-                    <li>
-                      <span className="px-3 py-1">...</span>
-                    </li>
-                    <li>
-                      <button className="px-3 py-1 rounded-md focus:outline-none focus:shadow-outline-purple">8</button>
-                    </li>
-                    <li>
-                      <button className="px-3 py-1 rounded-md focus:outline-none focus:shadow-outline-purple">9</button>
-                    </li>
+                    {Array.from({ length: pageCount }, (_, index) => {
+                      const page = index + 1;
+                      return (
+                        <li key={page}>
+                          <button
+                            onClick={() => setCurrentPage(page)}
+                            className={`px-3 py-1 transition-colors duration-150 border border-r-0 focus:outline-none focus:shadow-outline-purple ${
+                              currentPage === page
+                                ? 'text-white bg-blue-600 dark:bg-gray-100 dark:text-gray-800 border-blue-600 dark:border-gray-100'
+                                : 'text-gray-700 bg-white dark:bg-gray-800'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      );
+                    })}
                     <li>
                       <button
+                        onClick={() => {
+                          if (currentPage < pageCount) setCurrentPage(currentPage + 1);
+                        }}
                         className="px-3 py-1 rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple"
                         aria-label="Next"
+                        disabled={currentPage === pageCount}
                       >
                         <FontAwesomeIcon icon={faArrowRight} />
                       </button>
