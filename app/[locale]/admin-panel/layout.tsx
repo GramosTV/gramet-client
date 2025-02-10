@@ -2,7 +2,7 @@ import React from 'react';
 import AddProducts from './products/add/page';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faList, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faList, faPlus } from '@fortawesome/free-solid-svg-icons';
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
@@ -23,7 +23,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                   href="#"
                   className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-gray-800 pr-6"
                 >
-                  <span className="inline-flex justify-center items-center ml-4">icon</span>
+                  <FontAwesomeIcon icon={faBars} />
                   <span className="ml-2 text-sm tracking-wide truncate">Dashboard</span>
                 </a>
               </li>

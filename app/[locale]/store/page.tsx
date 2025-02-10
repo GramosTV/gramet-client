@@ -25,7 +25,7 @@ const Store = () => {
   const searchParams = useSearchParams();
   const category = searchParams.get('category');
   const [cart, setCart, removeValue] = useLocalStorage('cart', []);
-  const { data, isPending, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<SearchProductRes>({
     queryKey: ['products', page, limit, category, minPrice, maxPrice],
     queryFn: async (): Promise<SearchProductRes> => {
       const response = await fetchWithAuth(
@@ -179,45 +179,59 @@ const Store = () => {
         </div>
         <div className="min-h-[65vh]">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {!isPending || !isError
-              ? data?.products.map((product) => (
+            {(!isLoading || !isError) && data?.products.length ? (
+              data?.products.map((product) => (
+                <div
+                  className="card w-full max-w-sm bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 rounded-md cursor-pointer"
+                  key={product._id}
+                >
                   <div
-                    className="card w-full max-w-sm bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 rounded-md cursor-pointer"
-                    key={product._id}
+                    className="relative w-full h-40 my-4 cursor-pointer"
+                    onClick={() => router.push(`/store/product/${product.url}`)}
                   >
-                    <div
-                      className="relative w-full h-40 my-4 cursor-pointer"
-                      onClick={() => router.push(`/store/product/${product.url}`)}
-                    >
-                      <Image
-                        src={`data:image/png;base64,${product.image}`}
-                        alt={`${product.name} image`}
-                        fill
-                        className="object-contain overflow-hidden"
-                      />
-                    </div>
-                    <div className="p-5 pt-0 rounded-b-md">
-                      <div className="flex items-center justify-between">
-                        <div className="flex justify-between flex-col">
-                          <h2
-                            className="card-title text-base font-bold inline-block cursor-pointer"
-                            onClick={() => router.push(`/store/product/${product.url}`)}
-                          >
-                            {locale === 'pl' ? product.name : product.enName}
-                          </h2>
-                          <span className="text-sm">{product.price} zł / unit</span>
-                        </div>
-                        <button
-                          className="btn btn-outline flex items-center gap-2 hover:bg-blue-700 min-h-0 h-auto p-3 rounded-xl"
-                          onClick={(e) => handleAddToCart(e, product._id)}
+                    <Image
+                      src={`data:image/png;base64,${product.image}`}
+                      alt={`${product.name} image`}
+                      fill
+                      className="object-contain overflow-hidden"
+                    />
+                  </div>
+                  <div className="p-5 pt-0 rounded-b-md">
+                    <div className="flex items-center justify-between">
+                      <div className="flex justify-between flex-col">
+                        <h2
+                          className="card-title text-base font-bold inline-block cursor-pointer"
+                          onClick={() => router.push(`/store/product/${product.url}`)}
                         >
-                          <FontAwesomeIcon icon={faCartPlus} />
-                        </button>
+                          {locale === 'pl' ? product.name : product.enName}
+                        </h2>
+                        <span className="text-sm">{product.price} zł / unit</span>
                       </div>
+                      <button
+                        className="btn btn-outline flex items-center gap-2 hover:bg-blue-700 min-h-0 h-auto p-3 rounded-xl"
+                        onClick={(e) => handleAddToCart(e, product._id)}
+                      >
+                        <FontAwesomeIcon icon={faCartPlus} />
+                      </button>
                     </div>
                   </div>
-                ))
-              : null}
+                </div>
+              ))
+            ) : (
+              <div className="text-black">
+                <p>No products found.</p>
+                <button
+                  className="btn my-2"
+                  onClick={() => {
+                    setMinPrice(undefined);
+                    setMaxPrice(undefined);
+                    router.push('/store');
+                  }}
+                >
+                  Return
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
