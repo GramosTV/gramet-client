@@ -1,5 +1,6 @@
 'use client';
-import { Color, Category } from '@/app/common';
+import { Category } from '@/app/common/enums/category.enum';
+import { Color } from '@/app/common/interfaces/color.interface';
 import { fetchWithAuth } from '@/app/lib/auth-api';
 import React, { useState } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';

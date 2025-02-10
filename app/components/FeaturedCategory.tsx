@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import { Category, getCategory, SearchProduct } from '../common';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -11,6 +10,9 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useLocalStorage } from 'usehooks-ts';
 import { useAuth } from '@/context/AuthContext';
+import { SearchProduct } from '../common/interfaces/search-product.interface';
+import { Category } from '../common/enums/category.enum';
+import { getCategory } from '../lib/utils';
 
 const page = ({ products, category }: { products: SearchProduct[]; category: Category }) => {
   const { user } = useAuth();
@@ -40,7 +42,7 @@ const page = ({ products, category }: { products: SearchProduct[]; category: Cat
       setCart(res.itemData);
       toast.success('Product added successfully');
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error('Failed to add to cart');
     },
   });

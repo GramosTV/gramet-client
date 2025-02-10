@@ -3,12 +3,22 @@ import { notFound } from 'next/navigation';
 import { locales } from '../../i18n';
 import ReactQueryProvider from '../components/ReactQueryProvider';
 import LocaleClientLayout from './LocaleClientLayout';
+import { JSX } from 'react';
 
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: any }) {
+interface LayoutParams {
+  locale: string;
+}
+
+interface LocaleLayoutProps {
+  children: React.ReactNode;
+  params: LayoutParams | Promise<LayoutParams>;
+}
+
+export default async function LocaleLayout({ children, params }: LocaleLayoutProps): Promise<JSX.Element> {
   const { locale } = await params;
 
   let messages;

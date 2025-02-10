@@ -5,14 +5,14 @@ import { fetchWithAuth } from '../lib/auth-api';
 import { useLocalStorage } from 'usehooks-ts';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { toast } from 'react-toastify';
-import { Color, Product as ProductType } from '../common';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import { Carousel } from 'react-responsive-carousel';
 import ObjViewer from './ObjViewers';
 import { useAuth } from '@/context/AuthContext';
-
+import { Color } from '../common/interfaces/color.interface';
+import { Product as ProductType } from '../common/interfaces/product.interface';
 const Product = ({ product }: { product: ProductType }) => {
   const { user } = useAuth();
   const [cart, setCart, removeValue] = useLocalStorage('cart', []);

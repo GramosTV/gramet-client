@@ -1,14 +1,14 @@
 'use client';
-import { Color, Category, Order, DeliveryStatus } from '@/app/common';
 import { fetchWithAuth } from '@/app/lib/auth-api';
-import React, { useState } from 'react';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import React from 'react';
 import { useParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { Order } from '@/app/common/interfaces/order.interface';
+import { DeliveryStatus } from '@/app/common/enums/delivery-status.enum';
 
 const OrderPage: React.FC = () => {
   const { id } = useParams();

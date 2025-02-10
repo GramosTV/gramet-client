@@ -11,11 +11,13 @@ import {
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { useQuery } from '@tanstack/react-query';
-import { DeliveryStatus, Order, PaymentStatus } from '@/app/common';
 import { fetchWithAuth } from '@/app/lib/auth-api';
 import Loading from '@/app/components/Loading';
 import NotFound from '@/app/components/NotFound';
 import { useRouter } from 'next/navigation';
+import { PaymentStatus } from '@/app/common/enums/payment-status.enum';
+import { DeliveryStatus } from '@/app/common/enums/delivery-status.enum';
+import { Order } from '@/app/common/interfaces/order.interface';
 interface Statistics {
   totalOrders: number;
   totalProductsSold: number;

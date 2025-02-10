@@ -29,7 +29,7 @@ const page = () => {
     onSuccess: (res) => {
       setState(State.SUCCESS);
     },
-    onError: (error: any) => {
+    onError: (error) => {
       setState(State.ERROR);
     },
   });

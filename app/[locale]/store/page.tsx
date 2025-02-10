@@ -1,5 +1,4 @@
 'use client';
-import { Cart, Category, Color, SearchProductRes } from '@/app/common';
 import { fetchWithAuth } from '@/app/lib/auth-api';
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,6 +13,8 @@ import { useRouter } from 'next/navigation';
 import { formatURL } from '@/app/lib/utils';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
+import { Category } from '@/app/common/enums/category.enum';
+import { SearchProductRes } from '@/app/common/interfaces/search-product.interface';
 
 const Store = () => {
   const { user } = useAuth();
@@ -59,7 +60,7 @@ const Store = () => {
       setCart(res.itemData);
       toast.success('Product added successfully');
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error('Failed to add to cart');
     },
   });

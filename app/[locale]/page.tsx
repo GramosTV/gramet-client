@@ -1,7 +1,8 @@
-import { Category, SearchProductRes } from '../common';
 import EmblaCarousel from '../components/Carousel/EmblaCarousel';
 import { EmblaOptionsType } from 'embla-carousel';
 import FeaturedCategory from '../components/FeaturedCategory';
+import { SearchProductRes } from '../common/interfaces/search-product.interface';
+import { Category } from '../common/enums/category.enum';
 
 export default async function Home() {
   const category1: SearchProductRes = await fetch(

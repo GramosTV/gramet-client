@@ -4,7 +4,6 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBasketShopping, faCartShopping, faUser } from '@fortawesome/free-solid-svg-icons';
-import { Cart, Category } from '../common';
 import { useLocalStorage } from 'usehooks-ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { fetchWithAuth } from '../lib/auth-api';
@@ -12,6 +11,8 @@ import Image from 'next/image';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import { Category } from '../common/enums/category.enum';
+import { Cart } from '../common/interfaces/cart.interface';
 
 const Header = () => {
   const { user, setUser } = useAuth();
@@ -29,7 +30,7 @@ const Header = () => {
       toast.success('Successfully logged out');
       router.push('/');
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error(error?.message || 'Failed to logout');
     },
   });

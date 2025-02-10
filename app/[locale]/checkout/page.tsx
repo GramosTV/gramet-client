@@ -1,5 +1,4 @@
 'use client';
-import { Cart } from '@/app/common';
 import OrderSummary from '@/app/components/Checkout/OrderSummary';
 import PaymentDetails from '@/app/components/Checkout/PaymentDetails';
 import ShippingInfo, { ShippingFormInputs } from '@/app/components/Checkout/ShippingInfo';
@@ -10,6 +9,7 @@ import React, { useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { Cart } from '@/app/common/interfaces/cart.interface';
 enum Step {
   OrderSummary = 'Order Summary',
   ShippingInformation = 'Shipping Information',
@@ -48,7 +48,7 @@ const page: React.FC = () => {
     onSuccess: (res) => {
       router.push(res.url);
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error('Failed to place order');
     },
   });

@@ -1,5 +1,4 @@
 import React from 'react';
-import AddProducts from './products/add/page';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faList, faPlus } from '@fortawesome/free-solid-svg-icons';

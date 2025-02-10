@@ -1,12 +1,10 @@
 'use client';
-import { Cart, Order } from '@/app/common';
 import { fetchWithAuth } from '@/app/lib/auth-api';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { useLocalStorage } from 'usehooks-ts';
 import { useParams, useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
+import { Order } from '@/app/common/interfaces/order.interface';
 enum Step {
   OrderSummary = 'Order Summary',
   ShippingInformation = 'Shipping Information',

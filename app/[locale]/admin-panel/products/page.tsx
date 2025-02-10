@@ -1,5 +1,5 @@
 'use client';
-import { Color } from '@/app/common';
+import { Color } from '@/app/common/interfaces/color.interface';
 import { fetchWithAuth } from '@/app/lib/auth-api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
@@ -54,7 +54,7 @@ const ViewProducts = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       router.push('/admin-panel/products');
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error(error?.message || 'Failed to delete product');
     },
   });

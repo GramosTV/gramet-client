@@ -1,13 +1,14 @@
 'use client';
 //TO DO - image preview before add
-import { Color, Category } from '@/app/common';
 import { fetchWithAuth } from '@/app/lib/auth-api';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { useParams, redirect } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import { Category } from '@/app/common/enums/category.enum';
+import { Color } from '@/app/common/interfaces/color.interface';
 
 interface ProductFormValues {
   name: string;
@@ -85,7 +86,7 @@ const EditProduct: React.FC = () => {
       toast.success('Product updated successfully');
       router.push('/admin-panel/products');
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error(error?.message || 'Failed to update product');
     },
   });

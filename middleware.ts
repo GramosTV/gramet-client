@@ -1,8 +1,8 @@
 import createMiddleware from 'next-intl/middleware';
 import { NextRequest, NextResponse } from 'next/server';
 import * as jose from 'jose';
-import { Roles } from './app/common';
 import { TokenResponse } from './app/lib/auth-api';
+import { Role } from './app/common/enums/role.enum';
 
 const i18nMiddleware = createMiddleware({
   locales: ['pl', 'en'],
@@ -14,7 +14,6 @@ const i18nMiddleware = createMiddleware({
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get('accessToken')?.value;
 
-  // Block login/register if user is logged in
   if (['/login', '/register'].some((path) => req.nextUrl.pathname.startsWith(path)) && token) {
     try {
       if (!process.env.JWT_SECRET) {
@@ -24,7 +23,7 @@ export async function middleware(req: NextRequest) {
       await jose.jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
       return NextResponse.redirect(new URL('/', req.nextUrl.origin));
     } catch {
-      // If token is invalid, user can proceed
+      // Ignore errors and allow the request to continue.
     }
   }
 
@@ -32,25 +31,25 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/login', req.nextUrl.origin));
   }
 
-  // Require admin token for admin-panel
   if (req.nextUrl.pathname.startsWith('/admin-panel')) {
     if (!token) {
       return NextResponse.redirect(new URL('/login', req.nextUrl.origin));
     }
+
     try {
       if (!process.env.JWT_SECRET) {
         throw new Error('JWT_SECRET is not defined');
       }
+
       const decoded = await jose.jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
 
-      if (decoded.payload.role !== Roles.ADMIN) {
+      if (decoded.payload.role !== Role.ADMIN) {
         return NextResponse.redirect(new URL('/403', req.nextUrl.origin));
       }
-    } catch (err: any) {
-      if (err?.code === 'ERR_JWT_EXPIRED') {
+    } catch (err) {
+      if (err instanceof jose.errors.JWTExpired) {
         try {
           const refreshToken = req.cookies.get('refreshToken')?.value;
-          console.log('token1: ' + refreshToken);
           const res = await fetch(`${process.env.API_URL}/auth/refresh`, {
             method: 'POST',
             credentials: 'include',
@@ -58,15 +57,18 @@ export async function middleware(req: NextRequest) {
               Cookie: `refreshToken=${refreshToken}`,
             },
           });
+
           if (!res.ok) throw new Error();
+
           const data: TokenResponse = await res.json();
           const decoded = await jose.jwtVerify(data.accessToken, new TextEncoder().encode(process.env.JWT_SECRET));
-          if (decoded.payload.role !== Roles.ADMIN) {
+
+          if (decoded.payload.role !== Role.ADMIN) {
             return NextResponse.redirect(new URL('/403', req.nextUrl.origin));
           }
+
           const response = NextResponse.redirect(new URL(req.nextUrl.pathname, req.nextUrl.origin));
           response.cookies.set('accessToken', data.accessToken, {
-            // httpOnly: true,
             secure: true,
             sameSite: 'strict',
             path: '/',
