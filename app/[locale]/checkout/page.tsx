@@ -1,7 +1,7 @@
 'use client';
 import OrderSummary from '@/app/components/Checkout/OrderSummary';
 import PaymentDetails from '@/app/components/Checkout/PaymentDetails';
-import ShippingInfo, { ShippingFormInputs } from '@/app/components/Checkout/ShippingInfo';
+import ShippingInfo from '@/app/components/Checkout/ShippingInfo';
 import { fetchWithAuth } from '@/app/lib/auth-api';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
@@ -10,6 +10,9 @@ import { useLocalStorage } from 'usehooks-ts';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { Cart } from '@/app/common/interfaces/cart.interface';
+import { ShippingFormInputs } from '@/app/common/interfaces/shipping-form-inputs.interface';
+import { PaymentMethod } from '@/app/common/enums/payment-method.enum';
+import Loading from '@/app/components/Loading';
 enum Step {
   OrderSummary = 'Order Summary',
   ShippingInformation = 'Shipping Information',
@@ -20,6 +23,7 @@ enum Step {
 const page: React.FC = () => {
   const [cart, setCart, removeValue] = useLocalStorage<Cart>('cart', []);
   const [step, setStep] = useState(Step.OrderSummary);
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>();
   useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
@@ -72,11 +76,10 @@ const page: React.FC = () => {
             <li className="text-xl">Checkout</li>
           </ul>
         </div>
-        <div className="bg-base-100 p-8 flex rounded-lg">
+        <div className="bg-base-100 p-8 flex rounded-lg min-h-[450px]">
           <ul className="steps steps-vertical">
             <li className={`step step-primary`}>Order Summary</li>
             <li
-              onClick={() => setStep(Step.ShippingInformation)}
               className={`step ${
                 step === Step.ShippingInformation || step === Step.PaymentDetails || step === Step.Confirmation
                   ? 'step-primary'
@@ -85,18 +88,10 @@ const page: React.FC = () => {
             >
               Shipping Information
             </li>
-            <li
-              onClick={() => setStep(Step.PaymentDetails)}
-              className={`step ${step === Step.PaymentDetails || step === Step.Confirmation ? 'step-primary' : ''}`}
-            >
+            <li className={`step ${step === Step.PaymentDetails || step === Step.Confirmation ? 'step-primary' : ''}`}>
               Payment Details
             </li>
-            <li
-              onClick={() => setStep(Step.Confirmation)}
-              className={`step ${step === Step.Confirmation ? 'step-primary' : ''}`}
-            >
-              Confirmation
-            </li>
+            <li className={`step ${step === Step.Confirmation ? 'step-primary' : ''}`}>Confirmation</li>
           </ul>
           {(() => {
             switch (step) {
@@ -105,14 +100,50 @@ const page: React.FC = () => {
               case Step.ShippingInformation:
                 return <ShippingInfo setShippingInfo={setShippingInfo} />;
               case Step.PaymentDetails:
-                return <PaymentDetails submitOrder={submitOrder} />;
+                return (
+                  <PaymentDetails
+                    submitOrder={submitOrder}
+                    selectedMethod={selectedMethod}
+                    setSelectedMethod={setSelectedMethod}
+                  />
+                );
               case Step.Confirmation:
-                return <></>;
+                return <Loading fixedHeight={false} />;
               default:
                 return null;
             }
           })()}
         </div>
+        {step !== Step.Confirmation && (
+          <div className="mt-4 text-right">
+            <button
+              className={`bg-blue-600 text-white py-2 rounded hover:bg-blue-700 px-12 ${
+                (step === Step.ShippingInformation &&
+                  (!shippingInfo ||
+                    Object.entries(shippingInfo).some(([key, value]) => key !== 'apartmentNumber' && !value))) ||
+                (step === Step.PaymentDetails && !selectedMethod)
+                  ? 'opacity-50 cursor-not-allowed'
+                  : ''
+              }`}
+              onClick={() => {
+                if (step === Step.OrderSummary) setStep(Step.ShippingInformation);
+                else if (step === Step.ShippingInformation) setStep(Step.PaymentDetails);
+                else if (step === Step.PaymentDetails) {
+                  setStep(Step.Confirmation);
+                  submitOrder();
+                }
+              }}
+              disabled={
+                (step === Step.ShippingInformation &&
+                  (!shippingInfo ||
+                    Object.entries(shippingInfo).some(([key, value]) => key !== 'apartmentNumber' && !value))) ||
+                (step === Step.PaymentDetails && !selectedMethod)
+              }
+            >
+              Submit
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

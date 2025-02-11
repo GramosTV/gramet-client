@@ -26,6 +26,16 @@ This project is a multi-locale e-commerce application built with Next.js. It off
   - Shared components such as Header, Footer, Carousel, etc.
   - Global styles and Tailwind CSS for responsive design.
 
+## 📸 Screenshots
+
+### Home Page
+
+![Home Page](./readme-gifs/home.gif)
+
+### Purchase Flow
+
+![Purchase Flow](./readme-gifs/purchase.gif)
+
 ## 🗂️ Project Structure
 
 ```plaintext
@@ -72,6 +82,7 @@ This project is a multi-locale e-commerce application built with Next.js. It off
 
 - Node.js (LTS recommended)
 - npm or yarn
+- [Server](https://github.com/GramosTV/gramet-server)
 
 ### Setup
 

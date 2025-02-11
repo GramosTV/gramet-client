@@ -28,10 +28,12 @@ export async function fetchWithAuth(
         return await fetchWithAuth(url, options, true);
       }
     }
+    setAccessToken('');
     throw new Error('Unauthorized: Unable to refresh token');
   }
 
   if (!response.ok) {
+    setAccessToken('');
     throw new Error('Something went wrong');
   }
   return response;
@@ -49,6 +51,7 @@ async function refreshAccessToken(): Promise<boolean> {
     return true;
   } catch (error) {
     console.error('Error refreshing access token:', error);
+    setAccessToken('');
     return false;
   }
 }

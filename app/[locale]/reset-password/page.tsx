@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
@@ -10,7 +10,7 @@ type ResetPasswordFormValues = {
   repeatPassword: string;
 };
 
-const Page: React.FC = () => {
+const ResetPassword: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -91,4 +91,12 @@ const Page: React.FC = () => {
   );
 };
 
-export default Page;
+const page = () => {
+  return (
+    <Suspense>
+      <ResetPassword />
+    </Suspense>
+  );
+};
+
+export default page;

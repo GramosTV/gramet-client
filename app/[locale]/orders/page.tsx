@@ -1,11 +1,11 @@
 'use client';
-import { Order } from '@/app/common';
 import Loading from '@/app/components/Loading';
 import NotFound from '@/app/components/NotFound';
 import { fetchWithAuth } from '@/app/lib/auth-api';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import Image from 'next/image';
+import { Order } from '@/app/common/interfaces/order.interface';
 
 const page = () => {
   const { data, error, isLoading } = useQuery<Order[]>({

@@ -33,17 +33,14 @@ const ObjViewer = ({ objBase64, color, productId }: { objBase64: string; color: 
     scene.clearColor = backgroundColor;
 
     BABYLON.SceneLoader.ImportMesh(
-      '', // Mesh names (empty string for all meshes)
+      '',
       objBase64,
       `${productId}.obj`,
-      scene, // The scene to append the meshes to
+      scene,
       (meshes) => {
-        // This callback is triggered after meshes are successfully loaded
         scene.createDefaultCameraOrLight(true, true, true);
-
         const materialColor = hexToBABYLONColor3(color);
 
-        // Apply transformations and materials to each mesh
         meshes.forEach((mesh) => {
           const coloredMaterial = new BABYLON.PBRMaterial('coloredMaterial', scene);
           coloredMaterial.roughness = 0.5;
@@ -52,13 +49,12 @@ const ObjViewer = ({ objBase64, color, productId }: { objBase64: string; color: 
 
           mesh.material = coloredMaterial;
           mesh.rotation = new BABYLON.Vector3(Math.PI / 2, Math.PI, Math.PI);
-          mesh.scaling = new BABYLON.Vector3(1.4, 1.4, 1.4);
+          mesh.scaling = new BABYLON.Vector3(1.3, 1.3, 1.3);
           mesh.position = new BABYLON.Vector3(0, -40, 0);
         });
       },
-      null, // Progress callback (optional)
+      null,
       (scene, message) => {
-        // Error callback
         console.error('Error loading .obj file:', message);
       }
     );

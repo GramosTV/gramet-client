@@ -1,4 +1,3 @@
-import { Cart } from '../common';
 import { fetchWithAuth } from './auth-api';
 
 export const addToCart = async (productId: string, colorId: string = '') => {

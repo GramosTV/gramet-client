@@ -1,5 +1,4 @@
 'use client';
-import { Order } from '@/app/common';
 import { fetchWithAuth } from '@/app/lib/auth-api';
 import React from 'react';
 import { useParams } from 'next/navigation';
@@ -11,6 +10,7 @@ import Loading from '@/app/components/Loading';
 import NotFound from '@/app/components/NotFound';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Order } from '@/app/common/interfaces/order.interface';
 const OrderPage: React.FC = () => {
   const { id } = useParams();
   const router = useRouter();
@@ -36,7 +36,7 @@ const OrderPage: React.FC = () => {
       <div className="mx-auto w-full px-4 2xl:px-0">
         <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">Order #{data._id}</h2>
 
-        <div className="mt-6 sm:mt-8 lg:flex lg:gap-8">
+        <div className="mt-6 sm:mt-8 lg:flex lg:gap-8 min-h-[600px]">
           <div className="w-full divide-y flex flex-col justify-between divide-gray-200 overflow-hidden rounded-lg border border-gray-200 lg:max-w-xl xl:max-w-2xl">
             {data.items.map((item) => (
               <div className="space-y-4 p-6" key={item._id}>
@@ -74,13 +74,17 @@ const OrderPage: React.FC = () => {
                 <dl className="flex items-center justify-between gap-4">
                   <dt className="font-normal text-gray-500">Original price</dt>
                   <dd className="font-medium text-gray-900">
-                    {data.items.reduce((total, item) => total + item.product.price, 0).toFixed(2)} zł
+                    {(
+                      data.items.reduce((total, item) => total + item.product.price, 0) +
+                      Number(process.env.NEXT_PUBLIC_FIXED_DELIVERY_COST)
+                    ).toFixed(2)}
+                    zł
                   </dd>
                 </dl>
 
                 <dl className="flex items-center justify-between gap-4">
                   <dt className="font-normal text-gray-500">Delivery</dt>
-                  <dd className="font-medium text-gray-900">11 zł</dd>
+                  <dd className="font-medium text-gray-900">{process.env.NEXT_PUBLIC_FIXED_DELIVERY_COST} zł</dd>
                 </dl>
 
                 {/* <dl className="flex items-center justify-between gap-4">
@@ -107,14 +111,18 @@ const OrderPage: React.FC = () => {
               <dl className="flex items-center justify-between gap-4 border-t border-gray-200 pt-2">
                 <dt className="text-lg font-bold text-gray-900">Total</dt>
                 <dd className="text-lg font-bold text-gray-900">
-                  {data.items.reduce((total, item) => total + item.priceAtTimeOfOrder, 0).toFixed(2)} zł
+                  {(
+                    data.items.reduce((total, item) => total + item.priceAtTimeOfOrder, 0) +
+                    Number(process.env.NEXT_PUBLIC_FIXED_DELIVERY_COST)
+                  ).toFixed(2)}{' '}
+                  zł
                 </dd>
               </dl>
             </div>
           </div>
 
-          <div className="mt-6 grow sm:mt-8 lg:mt-0">
-            <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="mt-6 grow sm:mt-8 lg:mt-0 min-h-[100%]">
+            <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm h-full">
               <h3 className="text-xl font-semibold text-gray-900">Order history</h3>
 
               <ol className="relative ms-3 border-s border-gray-200">
@@ -138,11 +146,14 @@ const OrderPage: React.FC = () => {
                       />
                     </svg>
                   </span>
-                  <h4 className="mb-0.5 text-base font-semibold text-gray-900">Estimated delivery in 24 Nov 2023</h4>
-                  <p className="text-sm font-normal text-gray-500">Products delivered</p>
+                  <h4 className="mb-0.5 text-base font-semibold text-gray-900">
+                    Estimated delivery on{' '}
+                    {new Date(new Date(data.createdAt).getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                  </h4>
+                  <p className="text-sm font-normal text-gray-500">Order is on its way</p>
                 </li>
 
-                <li className="mb-10 ms-6">
+                {/* <li className="mb-10 ms-6">
                   <span className="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white">
                     <svg
                       className="h-4 w-4 text-gray-500"
@@ -264,7 +275,7 @@ const OrderPage: React.FC = () => {
                       Order placed - Receipt #647563
                     </a>
                   </div>
-                </li>
+                </li> */}
               </ol>
 
               {/* <div className="gap-4 sm:flex sm:items-center">

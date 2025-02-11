@@ -1,14 +1,7 @@
 'use client';
-import React, { Dispatch, SetStateAction } from 'react';
+import { ShippingFormInputs } from '@/app/common/interfaces/shipping-form-inputs.interface';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-export interface ShippingFormInputs {
-  fullName: string;
-  street: string;
-  houseNumber: string;
-  apartmentNumber?: string;
-  city: string;
-  zipCode: string;
-}
 
 interface ShippingFormProps {
   setShippingInfo: Dispatch<SetStateAction<ShippingFormInputs | undefined>>;
@@ -19,11 +12,18 @@ export const ShippingForm = ({ setShippingInfo }: ShippingFormProps) => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<ShippingFormInputs>();
 
   const onSubmit: SubmitHandler<ShippingFormInputs> = (data) => {
     setShippingInfo(data);
   };
+
+  const watchedValues = watch();
+
+  useEffect(() => {
+    onSubmit(watchedValues);
+  }, [watchedValues]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="p-6 bg-white rounded space-y-4 mx-auto">
@@ -63,7 +63,6 @@ export const ShippingForm = ({ setShippingInfo }: ShippingFormProps) => {
           {errors.zipCode && <p className="text-red-500 text-sm">{errors.zipCode.message}</p>}
         </div>
       </div>
-      <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Confirm</button>
     </form>
   );
 };

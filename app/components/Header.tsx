@@ -112,7 +112,7 @@ const Header = () => {
                 </ul>
               </li>
               <li>
-                <a>Item 3</a>
+                <a>About</a>
               </li>
             </ul>
           </div>
@@ -169,8 +169,8 @@ const Header = () => {
                 </li>
               </ul>
             </div>
-            <li className="flex justify-center items-center px-2">
-              <a className="font-[600]">Item 3</a>
+            <li className="flex justify-center items-center">
+              <a className="font-[600]">About</a>
             </li>
           </ul>
         </div>

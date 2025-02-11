@@ -1,13 +1,11 @@
 'use client';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { fetchWithAuth, setAccessToken } from '../../lib/auth-api';
+import { setAccessToken } from '../../lib/auth-api';
 import { useTranslations } from 'next-intl';
-import { Bounce, toast } from 'react-toastify';
-import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
-import { useLocalStorage } from 'usehooks-ts';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import * as jose from 'jose';
 
 type LoginFormValues = {

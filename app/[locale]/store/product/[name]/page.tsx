@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Head from 'next/head';
 import Product from '@/app/components/Product';
-import { Product as ProductType } from '@/app/common';
+import { Product as ProductType } from '@/app/common/interfaces/product.interface';
 import { Metadata, ResolvingMetadata } from 'next';
 import { useTranslations } from 'next-intl';
 import { getLocale } from 'next-intl/server';

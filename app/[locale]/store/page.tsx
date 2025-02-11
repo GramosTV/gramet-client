@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useLocalStorage } from 'usehooks-ts';
 import Image from 'next/image';
@@ -279,4 +279,12 @@ const Store = () => {
   );
 };
 
-export default Store;
+const page = () => {
+  return (
+    <Suspense>
+      <Store />
+    </Suspense>
+  );
+};
+
+export default page;

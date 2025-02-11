@@ -63,6 +63,7 @@ const page: React.FC = () => {
               Confirmation
             </li>
           </ul>
+
           <div className="p-4 bg-white shadow-sm rounded-md w-full max-w-xl mx-auto flex">
             {isLoading ? <p>Loading...</p> : error ? <p>Error loading order details</p> : <p>{JSON.stringify(data)}</p>}
           </div>
