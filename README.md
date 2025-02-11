@@ -32,6 +32,10 @@ This project is a multi-locale e-commerce application built with Next.js. It off
 
 ![Home Page](./readme-gifs/home.gif)
 
+### Product Page
+
+![Product Page](./readme-gifs/product.gif)
+
 ### Purchase Flow
 
 ![Purchase Flow](./readme-gifs/purchase.gif)
