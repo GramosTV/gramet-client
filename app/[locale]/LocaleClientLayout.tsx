@@ -33,6 +33,7 @@ export default function LocaleClientLayout({
   locale: string;
   messages: Record<string, string>;
 }) {
+  //
   return (
     <html lang={locale}>
       <Head>
