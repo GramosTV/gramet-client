@@ -4,6 +4,7 @@ import { locales } from '../../i18n';
 import ReactQueryProvider from '../components/ReactQueryProvider';
 import LocaleClientLayout from './LocaleClientLayout';
 import { JSX } from 'react';
+import Head from 'next/head';
 
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -31,6 +32,24 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   return (
     <ReactQueryProvider>
       <LocaleClientLayout locale={locale} messages={messages}>
+        <Head>
+          <script
+            type="text/javascript"
+            dangerouslySetInnerHTML={{
+              __html: `
+              window.$crisp = [];
+              window.CRISP_WEBSITE_ID = '38ef16c3-c164-4ab1-901e-cd7d0e257ed5';
+              (function() {
+                var d = document;
+                var s = d.createElement('script');
+                s.src = 'https://client.crisp.chat/l.js';
+                s.async = 1;
+                d.getElementsByTagName('head')[0].appendChild(s);
+              })();
+            `,
+            }}
+          />
+        </Head>
         {children}
       </LocaleClientLayout>
     </ReactQueryProvider>

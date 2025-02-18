@@ -32,19 +32,6 @@ export default function LocaleClientLayout({
   locale: string;
   messages: Record<string, string>;
 }) {
-  useEffect(() => {
-    window.$crisp = [];
-    window.CRISP_WEBSITE_ID = '38ef16c3-c164-4ab1-901e-cd7d0e257ed5';
-
-    const script = document.createElement('script');
-    script.src = 'https://client.crisp.chat/l.js';
-    script.async = true;
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
   return (
     <html lang={locale}>
       <body>
