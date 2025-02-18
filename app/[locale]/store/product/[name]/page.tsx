@@ -32,8 +32,6 @@ const ProductPage = async ({
 }: Readonly<{
   params: Promise<{ name: string }>;
 }>) => {
-  //TESTING
-  // await new Promise((_, reject) => setTimeout(() => reject(new Error('An error occurred after 5 seconds')), 5000));
   const locale = await getLocale();
   const { name } = await params;
   const product: ProductType = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/by-name/${name}`, {

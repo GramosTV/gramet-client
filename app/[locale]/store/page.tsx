@@ -186,26 +186,24 @@ const Store = () => {
                   className="card w-full max-w-sm bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 rounded-md cursor-pointer"
                   key={product._id}
                 >
-                  <div
-                    className="relative w-full h-40 my-4 cursor-pointer"
-                    onClick={() => router.push(`/store/product/${product.url}`)}
-                  >
-                    <Image
-                      src={`data:image/png;base64,${product.image}`}
-                      alt={`${product.name} image`}
-                      fill
-                      className="object-contain overflow-hidden"
-                    />
-                  </div>
+                  <Link href={`/store/product/${product.url}`}>
+                    <div className="relative w-full h-40 my-4 cursor-pointer">
+                      <Image
+                        src={`data:image/png;base64,${product.image}`}
+                        alt={`${product.name} image`}
+                        fill
+                        className="object-contain overflow-hidden"
+                      />
+                    </div>
+                  </Link>
                   <div className="p-5 pt-0 rounded-b-md">
                     <div className="flex items-center justify-between">
                       <div className="flex justify-between flex-col">
-                        <h2
-                          className="card-title text-base font-bold inline-block cursor-pointer"
-                          onClick={() => router.push(`/store/product/${product.url}`)}
-                        >
-                          {locale === 'pl' ? product.name : product.enName}
-                        </h2>
+                        <Link href={`/store/product/${product.url}`}>
+                          <h2 className="card-title text-base font-bold inline-block cursor-pointer">
+                            {locale === 'pl' ? product.name : product.enName}
+                          </h2>
+                        </Link>
                         <span className="text-sm">{product.price} zł / unit</span>
                       </div>
                       <button
@@ -221,16 +219,9 @@ const Store = () => {
             ) : (
               <div className="text-black">
                 <p>No products found.</p>
-                <button
-                  className="btn my-2"
-                  onClick={() => {
-                    setMinPrice(undefined);
-                    setMaxPrice(undefined);
-                    router.push('/store');
-                  }}
-                >
+                <Link className="btn my-2" href={'/store'}>
                   Return
-                </button>
+                </Link>
               </div>
             )}
           </div>
