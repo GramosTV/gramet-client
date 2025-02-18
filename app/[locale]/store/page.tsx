@@ -15,6 +15,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { Category } from '@/app/common/enums/category.enum';
 import { SearchProductRes } from '@/app/common/interfaces/search-product.interface';
+import Loading from '@/app/components/Loading';
 
 const Store = () => {
   const { user } = useAuth();
@@ -216,6 +217,8 @@ const Store = () => {
                   </div>
                 </div>
               ))
+            ) : isLoading ? (
+              <Loading />
             ) : (
               <div className="text-black">
                 <p>No products found.</p>
