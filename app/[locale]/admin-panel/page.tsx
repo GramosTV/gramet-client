@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { PaymentStatus } from '@/app/common/enums/payment-status.enum';
 import { DeliveryStatus } from '@/app/common/enums/delivery-status.enum';
 import { Order } from '@/app/common/interfaces/order.interface';
+import { CartItemForOrder } from '@/app/common/interfaces/cart.interface';
 import { useAdminOrders, useAdminStatistics } from '@/app/lib/hooks/useOrders';
 interface Statistics {
   totalOrders: number;
@@ -130,7 +131,8 @@ const AdminPanel = () => {
                         $
                         {order.items
                           .reduce(
-                            (total: number, item: any) => total + (item?.priceAtTimeOfOrder || 0) * item.quantity,
+                            (total: number, item: CartItemForOrder) =>
+                              total + (item?.priceAtTimeOfOrder || 0) * item.quantity,
                             0
                           )
                           .toFixed(2)}

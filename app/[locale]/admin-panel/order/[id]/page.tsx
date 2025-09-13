@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { Order } from '@/app/common/interfaces/order.interface';
+import { CartItemForOrder } from '@/app/common/interfaces/cart.interface';
+import { Color } from '@/app/common/interfaces/color.interface';
 import { DeliveryStatus } from '@/app/common/enums/delivery-status.enum';
 import { useOrder, useDispatchOrder } from '@/app/lib/hooks/useOrders';
 
@@ -72,7 +74,7 @@ const OrderPage: React.FC = () => {
         <div className="mb-6">
           <h2 className="text-xl font-bold text-gray-800">Items</h2>
           <ul className="list-inside list-none">
-            {data.items.map((item: any, index: number) => (
+            {data.items.map((item: CartItemForOrder, index: number) => (
               <li key={index} className="mb-4 text-gray-700">
                 <p className="mb-1 text-gray-700">
                   <strong className="text-gray-700">Product ID:</strong> {item.productId}
@@ -82,7 +84,7 @@ const OrderPage: React.FC = () => {
                 </p>
                 <p className="mb-1 text-gray-700">
                   <strong className="text-gray-700">Product color:</strong>{' '}
-                  {item.product ? item.product.colors.find((color: any) => color._id === item.colorId)?.name : 'N/A'}
+                  {item.product ? item.product.colors.find((color: Color) => color._id === item.colorId)?.name : 'N/A'}
                 </p>
                 <p className="mb-1 text-gray-700">
                   <strong className="text-gray-700">Quantity:</strong> {item.quantity}

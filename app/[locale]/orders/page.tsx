@@ -4,6 +4,7 @@ import NotFound from '@/app/components/NotFound';
 import React from 'react';
 import Image from 'next/image';
 import { Order } from '@/app/common/interfaces/order.interface';
+import { CartItemForOrder } from '@/app/common/interfaces/cart.interface';
 import { useUserOrders } from '@/app/lib/hooks/useOrders';
 
 const OrdersPage = () => {
@@ -31,7 +32,7 @@ const OrdersPage = () => {
           </p>
           <h3>Items</h3>
           <ul>
-            {order.items.map((item: any, index: number) => (
+            {order.items.map((item: CartItemForOrder, index: number) => (
               <li key={index}>
                 <p>
                   <strong>Product:</strong>{' '}
