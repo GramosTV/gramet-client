@@ -11,7 +11,7 @@ import { formatURL } from '@/app/lib/utils';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { Category } from '@/app/common/enums/category.enum';
-import { SearchProductRes } from '@/app/common/interfaces/search-product.interface';
+import { SearchProductRes, SearchProduct } from '@/app/common/interfaces/search-product.interface';
 import Loading from '@/app/components/Loading';
 import { useProducts } from '@/app/lib/hooks/useProducts';
 import { useAddToCart } from '@/app/lib/hooks/useCart';
@@ -164,7 +164,7 @@ const Store = () => {
         <div className="min-h-[65vh]">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {(!isLoading || !isError) && data?.products.length ? (
-              data?.products.map((product: any) => (
+              data?.products.map((product: SearchProduct) => (
                 <div
                   className="card w-full max-w-sm bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 rounded-md cursor-pointer"
                   key={product._id}

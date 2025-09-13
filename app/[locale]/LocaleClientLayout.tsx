@@ -4,6 +4,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ReactQueryProvider from '../components/ReactQueryProvider';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import '../styles/globals.css';
@@ -36,14 +37,16 @@ export default function LocaleClientLayout({
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider locale={locale} messages={messages} timeZone={'Europe/Vienna'}>
-          <AuthProvider>
-            <Header />
-            {children}
-            <Footer />
-          </AuthProvider>
-        </NextIntlClientProvider>
-        <ToastContainer />
+        <ReactQueryProvider>
+          <NextIntlClientProvider locale={locale} messages={messages} timeZone={'Europe/Vienna'}>
+            <AuthProvider>
+              <Header />
+              {children}
+              <Footer />
+            </AuthProvider>
+          </NextIntlClientProvider>
+          <ToastContainer />
+        </ReactQueryProvider>
       </body>
     </html>
   );

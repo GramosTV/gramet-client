@@ -1,7 +1,6 @@
 // app/[locale]/layout.tsx (Server Component)
 import { notFound } from 'next/navigation';
 import { locales } from '../../i18n';
-import ReactQueryProvider from '../components/ReactQueryProvider';
 import LocaleClientLayout from './LocaleClientLayout';
 import { JSX } from 'react';
 import Head from 'next/head';
@@ -30,10 +29,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   }
 
   return (
-    <ReactQueryProvider>
-      <LocaleClientLayout locale={locale} messages={messages}>
-        {children}
-      </LocaleClientLayout>
-    </ReactQueryProvider>
+    <LocaleClientLayout locale={locale} messages={messages}>
+      {children}
+    </LocaleClientLayout>
   );
 }
