@@ -10,55 +10,47 @@ import {
   faShoppingBag,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
-import { useQuery } from '@tanstack/react-query';
-import { fetchWithAuth } from '@/app/lib/auth-api';
 import Loading from '@/app/components/Loading';
 import NotFound from '@/app/components/NotFound';
 import { useRouter } from 'next/navigation';
 import { PaymentStatus } from '@/app/common/enums/payment-status.enum';
 import { DeliveryStatus } from '@/app/common/enums/delivery-status.enum';
 import { Order } from '@/app/common/interfaces/order.interface';
+import { useAdminOrders, useAdminStatistics } from '@/app/lib/hooks/useOrders';
 interface Statistics {
   totalOrders: number;
   totalProductsSold: number;
   totalSales: number;
   awaitingDispatchCount: number;
 }
+
 const AdminPanel = () => {
-  const [pageCount, setPageCount] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
-  const [statistics, setStatistics] = useState<Statistics>({
+
+  const itemsPerPage = 12;
+
+  // Use React Query hooks
+  const { data: ordersData, error: ordersError, isLoading: ordersLoading } = useAdminOrders(currentPage, itemsPerPage);
+  const { data: statisticsData, error: statsError, isLoading: statsLoading } = useAdminStatistics();
+
+  const isLoading = ordersLoading || statsLoading;
+  const error = ordersError || statsError;
+
+  // Extract orders and pagination data
+  const orders = ordersData?.orders || [];
+  const pageCount = ordersData?.pageCount || 1;
+
+  // Extract statistics with fallback values
+  const statistics = statisticsData || {
     totalOrders: 0,
     totalProductsSold: 0,
     totalSales: 0,
     awaitingDispatchCount: 0,
-  });
-  const { data, error, isLoading } = useQuery<Order[]>({
-    queryKey: ['ordersForAdmin', currentPage],
-    queryFn: async () => {
-      const { orders, pageCount } = await fetchWithAuth(`/api/orders/forAdmin/?page=${currentPage}&limit=12`).then(
-        (res) => res.json()
-      );
-      setPageCount(pageCount);
-      return orders;
-    },
-    retry: 1,
-  });
-  useQuery<Statistics>({
-    queryKey: ['ordersStatistics'],
-    queryFn: async () => {
-      const { totalOrders, totalProductsSold, totalSales, awaitingDispatchCount } = await fetchWithAuth(
-        '/api/orders/statistics'
-      ).then((res) => res.json());
-      setStatistics({ totalOrders, totalProductsSold, totalSales, awaitingDispatchCount });
-      return { totalOrders, totalProductsSold, totalSales, awaitingDispatchCount };
-    },
-    retry: 1,
-  });
-  const itemsPerPage = 12;
+  };
+
   const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = startItem + (data?.length || 0) - 1;
+  const endItem = startItem + (orders?.length || 0) - 1;
   const totalItems = pageCount * itemsPerPage;
 
   if (isLoading) return <Loading />;
@@ -115,7 +107,7 @@ const AdminPanel = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                  {data?.map((order, index) => (
+                  {orders?.map((order: Order, index: number) => (
                     <tr
                       key={index}
                       className="cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400"
@@ -137,7 +129,10 @@ const AdminPanel = () => {
                       <td className="px-4 py-3 text-sm">
                         $
                         {order.items
-                          .reduce((total, item) => total + (item?.priceAtTimeOfOrder || 0) * item.quantity, 0)
+                          .reduce(
+                            (total: number, item: any) => total + (item?.priceAtTimeOfOrder || 0) * item.quantity,
+                            0
+                          )
                           .toFixed(2)}
                       </td>
                       <td className="px-4 py-3 text-xs">

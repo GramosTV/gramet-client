@@ -1,11 +1,8 @@
 'use client';
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import { fetchWithAuth, setAccessToken } from '../../lib/auth-api';
 import { useTranslations } from 'next-intl';
-import { Bounce, toast } from 'react-toastify';
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
+import { useRegister } from '@/app/lib/hooks/useAuth';
 
 type RegisterFormValues = {
   name: string;
@@ -23,30 +20,12 @@ const Register: React.FC = () => {
     watch,
     formState: { errors },
   } = useForm<RegisterFormValues>();
-  const [pending, setPending] = useState(false);
-  const router = useRouter();
-  const t = useTranslations('Register');
 
-  const onSubmit = async (data: RegisterFormValues) => {
-    setPending(true);
-    try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to register');
-      }
-      setPending(false);
-      toast.success(t('success'));
-      router.push('/login');
-    } catch (error) {
-      setPending(false);
-      toast.error(t('fail'));
-    }
+  const t = useTranslations('Register');
+  const registerMutation = useRegister();
+
+  const onSubmit = (data: RegisterFormValues) => {
+    registerMutation.mutate(data);
   };
 
   return (
@@ -64,6 +43,7 @@ const Register: React.FC = () => {
               type="text"
               placeholder={t('name')}
               className={`w-full mt-1 p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+              disabled={registerMutation.isPending}
             />
             {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>}
           </div>
@@ -77,6 +57,7 @@ const Register: React.FC = () => {
               type="text"
               placeholder={t('surname')}
               className={`w-full mt-1 p-2 border ${errors.surname ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+              disabled={registerMutation.isPending}
             />
             {errors.surname && <p className="mt-1 text-sm text-red-500">{errors.surname.message}</p>}
           </div>
@@ -90,6 +71,7 @@ const Register: React.FC = () => {
               type="email"
               placeholder="Email"
               className={`w-full mt-1 p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+              disabled={registerMutation.isPending}
             />
             {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
           </div>
@@ -104,6 +86,7 @@ const Register: React.FC = () => {
               type="password"
               placeholder={t('pass')}
               className={`w-full mt-1 p-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+              disabled={registerMutation.isPending}
             />
             {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>}
           </div>
@@ -119,6 +102,7 @@ const Register: React.FC = () => {
               className={`w-full mt-1 p-2 border ${
                 errors.repeatPassword ? 'border-red-500' : 'border-gray-300'
               } rounded-md`}
+              disabled={registerMutation.isPending}
             />
             {errors.repeatPassword && <p className="mt-1 text-sm text-red-500">{errors.repeatPassword.message}</p>}
           </div>
@@ -134,14 +118,18 @@ const Register: React.FC = () => {
               className={`w-full mt-1 p-2 border ${
                 errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
               } rounded-md`}
+              disabled={registerMutation.isPending}
             />
             {errors.phoneNumber && <p className="mt-1 text-sm text-red-500">{errors.phoneNumber.message}</p>}
           </div>
           <button
             type="submit"
-            className={'w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700' + (pending ? ' btn-off' : '')}
+            disabled={registerMutation.isPending}
+            className={`w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed ${
+              registerMutation.isPending ? 'btn-off' : ''
+            }`}
           >
-            {t('register')}
+            {registerMutation.isPending ? 'Creating account...' : t('register')}
           </button>
         </form>
       </div>

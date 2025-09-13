@@ -1,27 +1,22 @@
 'use client';
 import Loading from '@/app/components/Loading';
 import NotFound from '@/app/components/NotFound';
-import { fetchWithAuth } from '@/app/lib/auth-api';
-import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import Image from 'next/image';
 import { Order } from '@/app/common/interfaces/order.interface';
+import { useUserOrders } from '@/app/lib/hooks/useOrders';
 
-const page = () => {
-  const { data, error, isLoading } = useQuery<Order[]>({
-    queryKey: ['orders'],
-    queryFn: async () => {
-      const response = await fetchWithAuth(`/api/orders/all`);
-      return await response.json();
-    },
-    retry: 1,
-  });
+const OrdersPage = () => {
+  // Use React Query hook
+  const { data, error, isLoading } = useUserOrders();
+
   if (isLoading) return <Loading />;
   if (error) return <NotFound />;
+
   return (
     <div>
       <h1>Orders</h1>
-      {data?.map((order) => (
+      {data?.map((order: Order) => (
         <div key={order.transactionId} style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
           <p>
             <strong>Address:</strong> {order.street} {order.houseNumber},{' '}
@@ -36,7 +31,7 @@ const page = () => {
           </p>
           <h3>Items</h3>
           <ul>
-            {order.items.map((item, index) => (
+            {order.items.map((item: any, index: number) => (
               <li key={index}>
                 <p>
                   <strong>Product:</strong>{' '}
@@ -59,4 +54,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default OrdersPage;

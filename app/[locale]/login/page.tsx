@@ -1,12 +1,8 @@
 'use client';
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import { setAccessToken } from '../../lib/auth-api';
 import { useTranslations } from 'next-intl';
-import { toast } from 'react-toastify';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
-import * as jose from 'jose';
+import { useLogin } from '@/app/lib/hooks/useAuth';
 
 type LoginFormValues = {
   email: string;
@@ -19,39 +15,14 @@ const Login: React.FC = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormValues>();
-  const [pending, setPending] = useState(false);
-  const router = useRouter();
-  const { user, setUser } = useAuth();
-  const onSubmit = async (data: LoginFormValues) => {
-    setPending(true);
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        if (response.status === 401) {
-          toast.error('Please validate your email');
-          setPending(false);
-          return;
-        }
-        throw new Error('Failed to login');
-      }
-      const result = await response.json();
-      setAccessToken(result.accessToken);
-      setPending(false);
-      toast.success(t('success'));
-      setUser(jose.decodeJwt(result.accessToken));
-      router.push('/');
-    } catch (error) {
-      setPending(false);
-      toast.error(t('fail'));
-    }
-  };
+
   const t = useTranslations('Login');
+  const loginMutation = useLogin();
+
+  const onSubmit = (data: LoginFormValues) => {
+    loginMutation.mutate(data);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-var(--header-height)*2)]">
       <div className="flex-grow max-w-md p-6 mx-auto bg-gray-100 rounded-md shadow-md">
@@ -67,6 +38,7 @@ const Login: React.FC = () => {
               type="email"
               placeholder="Email"
               className={`w-full mt-1 p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+              disabled={loginMutation.isPending}
             />
             {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
           </div>
@@ -80,15 +52,19 @@ const Login: React.FC = () => {
               type="password"
               placeholder={t('pass')}
               className={`w-full mt-1 p-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+              disabled={loginMutation.isPending}
             />
             {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>}
           </div>
 
           <button
             type="submit"
-            className={'w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700' + (pending ? ' btn-off' : '')}
+            disabled={loginMutation.isPending}
+            className={`w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed ${
+              loginMutation.isPending ? 'btn-off' : ''
+            }`}
           >
-            {t('login')}
+            {loginMutation.isPending ? 'Logging in...' : t('login')}
           </button>
         </form>
       </div>

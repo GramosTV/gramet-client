@@ -1,9 +1,9 @@
 'use client';
 import { Category } from '@/app/common/enums/category.enum';
 import { Color } from '@/app/common/interfaces/color.interface';
-import { fetchWithAuth } from '@/app/lib/auth-api';
 import React, { useState } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { useCreateProduct } from '@/app/lib/hooks/useProducts';
 
 interface ProductFormValues {
   name: string;
@@ -39,7 +39,10 @@ const AddProducts: React.FC = () => {
     control,
     name: 'colors',
   });
+
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const createProductMutation = useCreateProduct();
+
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
@@ -47,7 +50,8 @@ const AddProducts: React.FC = () => {
       setImagePreviews(previews);
     }
   };
-  const onSubmit = async (data: ProductFormValues) => {
+
+  const onSubmit = (data: ProductFormValues) => {
     const formData = new FormData();
     formData.append('name', data.name);
     formData.append('enName', data.enName);
@@ -58,25 +62,18 @@ const AddProducts: React.FC = () => {
     formData.append('materials', JSON.stringify(data.materials));
     formData.append('colors', JSON.stringify(data.colors));
     formData.append('public', data.public as any);
+
     Array.from(data.images).forEach((file) => {
       formData.append('images', file);
     });
+
     if (data.objFile) {
       Array.from(data.objFile).forEach((file) => {
         formData.append('objFile', file);
       });
     }
 
-    try {
-      const response = await fetchWithAuth('/api/products', {
-        method: 'POST',
-        body: formData,
-      });
-      const result = await response.json();
-      console.log(result);
-    } catch (error) {
-      console.error(error);
-    }
+    createProductMutation.mutate(formData);
   };
 
   return (
@@ -303,8 +300,12 @@ const AddProducts: React.FC = () => {
           <input {...register('public')} type="checkbox" className="mt-1" />
         </div>
 
-        <button type="submit" className="w-full p-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">
-          Submit
+        <button
+          type="submit"
+          disabled={createProductMutation.isPending}
+          className="w-full p-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {createProductMutation.isPending ? 'Creating...' : 'Submit'}
         </button>
       </form>
     </div>

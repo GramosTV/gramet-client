@@ -1,10 +1,9 @@
 'use client';
-import { fetchWithAuth } from '@/app/lib/auth-api';
-import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Order } from '@/app/common/interfaces/order.interface';
+import { useOrder } from '@/app/lib/hooks/useOrders';
 enum Step {
   OrderSummary = 'Order Summary',
   ShippingInformation = 'Shipping Information',
@@ -12,18 +11,13 @@ enum Step {
   Confirmation = 'Confirmation',
 }
 
-const page: React.FC = () => {
+const OrderConfirmationPage: React.FC = () => {
   const { orderId } = useParams();
   const [step, setStep] = useState(Step.Confirmation);
-  const { data, error, isLoading } = useQuery<Order>({
-    queryKey: ['order', orderId],
-    queryFn: async () => {
-      const response = await fetchWithAuth(`/api/orders/findById/${orderId}`);
-      return await response.json();
-    },
-    retry: 1,
-  });
   const router = useRouter();
+
+  // Use React Query hook
+  const { data, error, isPending: isLoading } = useOrder(orderId as string);
   return (
     <div className="mx-auto min-h-[calc(100vh-var(--header-height))] bg-gray-100 flex justify-center items-start">
       <div className="container max-w-[1200px] pt-8">
@@ -73,4 +67,4 @@ const page: React.FC = () => {
   );
 };
 
-export default page;
+export default OrderConfirmationPage;

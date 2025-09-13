@@ -1,12 +1,9 @@
 'use client';
-import { fetchWithAuth } from '@/app/lib/auth-api';
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import React, { Suspense, useState } from 'react';
-import { toast } from 'react-toastify';
 import { useLocalStorage } from 'usehooks-ts';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -16,59 +13,44 @@ import { useAuth } from '@/context/AuthContext';
 import { Category } from '@/app/common/enums/category.enum';
 import { SearchProductRes } from '@/app/common/interfaces/search-product.interface';
 import Loading from '@/app/components/Loading';
+import { useProducts } from '@/app/lib/hooks/useProducts';
+import { useAddToCart } from '@/app/lib/hooks/useCart';
 
 const Store = () => {
   const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(9);
-  const [pageCount, setPageCount] = useState(0);
   const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
   const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
   const searchParams = useSearchParams();
   const category = searchParams.get('category');
   const [cart, setCart, removeValue] = useLocalStorage('cart', []);
-  const { data, isLoading, isError } = useQuery<SearchProductRes>({
-    queryKey: ['products', page, limit, category, minPrice, maxPrice],
-    queryFn: async (): Promise<SearchProductRes> => {
-      const response = await fetchWithAuth(
-        `/api/products/?page=${page}&limit=${limit}&category=${category}&minPrice=${minPrice}&maxPrice=${maxPrice}`
-      );
-      const res = await response.json();
-      setPageCount(res?.pageCount);
-      return res;
-    },
-  });
   const router = useRouter();
-  const mutation = useMutation({
-    mutationFn: async (productId: string) => {
-      const response = await fetchWithAuth(`/api/cart`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId,
-          quantity: 1,
-          colorId: '',
-        }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to add to cart');
-      }
-      return await response.json();
-    },
-    onSuccess: (res) => {
-      setCart(res.itemData);
-      toast.success('Product added successfully');
-    },
-    onError: (error) => {
-      toast.error('Failed to add to cart');
-    },
+
+  // Use React Query hooks
+  const { data, isLoading, isError } = useProducts({
+    page,
+    limit,
+    category,
+    minPrice,
+    maxPrice,
   });
+
+  const addToCartMutation = useAddToCart();
+
+  const pageCount = data?.pageCount || 0;
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>, id: string) => {
     e.stopPropagation();
-    user ? mutation.mutate(id) : router.push('/login');
+    if (user) {
+      addToCartMutation.mutate({
+        productId: id,
+        quantity: 1,
+        colorId: '',
+      });
+    } else {
+      router.push('/login');
+    }
   };
 
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -182,7 +164,7 @@ const Store = () => {
         <div className="min-h-[65vh]">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {(!isLoading || !isError) && data?.products.length ? (
-              data?.products.map((product) => (
+              data?.products.map((product: any) => (
                 <div
                   className="card w-full max-w-sm bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 rounded-md cursor-pointer"
                   key={product._id}

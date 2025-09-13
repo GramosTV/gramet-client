@@ -2,17 +2,16 @@
 import OrderSummary from '@/app/components/Checkout/OrderSummary';
 import PaymentDetails from '@/app/components/Checkout/PaymentDetails';
 import ShippingInfo from '@/app/components/Checkout/ShippingInfo';
-import { fetchWithAuth } from '@/app/lib/auth-api';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
 import { Cart } from '@/app/common/interfaces/cart.interface';
 import { ShippingFormInputs } from '@/app/common/interfaces/shipping-form-inputs.interface';
 import { PaymentMethod } from '@/app/common/enums/payment-method.enum';
 import Loading from '@/app/components/Loading';
+import { useCart } from '@/app/lib/hooks/useCart';
+import { useCreateOrder } from '@/app/lib/hooks/useOrders';
 enum Step {
   OrderSummary = 'Order Summary',
   ShippingInformation = 'Shipping Information',
@@ -20,47 +19,27 @@ enum Step {
   Confirmation = 'Confirmation',
 }
 
-const page: React.FC = () => {
+const CheckoutPage: React.FC = () => {
   const [cart, setCart, removeValue] = useLocalStorage<Cart>('cart', []);
   const [step, setStep] = useState(Step.OrderSummary);
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>();
-  useQuery({
-    queryKey: ['cart'],
-    queryFn: async () => {
-      const response = await fetchWithAuth('/api/cart');
-      const data = await response.json();
-      console.log(data.itemData);
-      setCart(data.itemData);
-      return data;
-    },
-    retry: 1,
-  });
-  const mutation = useMutation({
-    mutationFn: async (formData: ShippingFormInputs) => {
-      const response = await fetchWithAuth(`/api/orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update product');
-      }
-      return await response.json();
-    },
-    onSuccess: (res) => {
-      router.push(res.url);
-    },
-    onError: (error) => {
-      toast.error('Failed to place order');
-    },
-  });
   const [shippingInfo, setShippingInfo] = useState<ShippingFormInputs>();
   const router = useRouter();
+
+  // Use React Query hooks
+  const { data: cartData } = useCart();
+  const createOrderMutation = useCreateOrder();
+
+  // Update local cart when server cart changes
+  React.useEffect(() => {
+    if (cartData) {
+      setCart(cartData);
+    }
+  }, [cartData, setCart]);
+
   const submitOrder = async () => {
     if (shippingInfo) {
-      mutation.mutate(shippingInfo);
+      createOrderMutation.mutate(shippingInfo);
     }
   };
   return (
@@ -149,4 +128,4 @@ const page: React.FC = () => {
   );
 };
 
-export default page;
+export default CheckoutPage;

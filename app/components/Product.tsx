@@ -1,10 +1,7 @@
 'use client';
-import { useMutation } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
-import { fetchWithAuth } from '../lib/auth-api';
 import { useLocalStorage } from 'usehooks-ts';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
-import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
@@ -13,49 +10,49 @@ import ObjViewer from './ObjViewers';
 import { useAuth } from '@/context/AuthContext';
 import { Color } from '../common/interfaces/color.interface';
 import { Product as ProductType } from '../common/interfaces/product.interface';
+import { useAddToCart } from '../lib/hooks/useCart';
 const Product = ({ product }: { product: ProductType }) => {
   const { user } = useAuth();
   const [cart, setCart, removeValue] = useLocalStorage('cart', []);
   const [notif, setNotif] = useState(true);
   const router = useRouter();
   const [show3DView, setShow3DView] = useState(false);
-  const mutation = useMutation({
-    mutationFn: async (productId: string, notif = true) => {
-      const response = await fetchWithAuth(`/api/cart`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId,
-          quantity,
-          colorId: selectedColor,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to add to cart');
-      }
-      return await response.json();
-    },
-    onSuccess: (res) => {
-      setCart(res.itemData);
-      if (notif) toast.success('Product added successfully');
-    },
-    onError: () => {
-      toast.error('Failed to add to cart');
-    },
-  });
+  const [selectedColor, setSelectedColor] = useState<string>(product.colors[0]?._id || '');
+  const [quantity, setQuantity] = useState<number>(1);
+
+  // Use React Query hook
+  const addToCartMutation = useAddToCart();
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     setNotif(true);
     e.stopPropagation();
-    if (product._id) user ? mutation.mutate(product._id) : router.push('/login');
+    if (product._id) {
+      if (user) {
+        addToCartMutation.mutate({
+          productId: product._id,
+          quantity,
+          colorId: selectedColor,
+        });
+      } else {
+        router.push('/login');
+      }
+    }
   };
 
   const handleBuy = () => {
     setNotif(false);
-    if (product._id) user ? mutation.mutate(product._id) : router.push('/login');
-    router.push('/checkout');
+    if (product._id) {
+      if (user) {
+        addToCartMutation.mutate({
+          productId: product._id,
+          quantity,
+          colorId: selectedColor,
+        });
+        router.push('/checkout');
+      } else {
+        router.push('/login');
+      }
+    }
   };
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,14 +64,13 @@ const Product = ({ product }: { product: ProductType }) => {
     }
   };
 
-  const [selectedColor, setSelectedColor] = useState<string>(product.colors[0]?._id || '');
-  const [quantity, setQuantity] = useState<number>(1);
   useEffect(() => {
     const selectedColorStock = product.colors.find((color) => color._id === selectedColor)?.stock;
     if (selectedColorStock !== undefined && quantity > selectedColorStock) {
       setQuantity(selectedColorStock);
     }
   }, [selectedColor, product.colors, quantity]);
+
   return (
     <div className="bg-base-100 p-8 flex rounded-lg">
       <div className="flex flex-col max-w-[440px]">

@@ -1,8 +1,6 @@
 'use client';
-import { fetchWithAuth } from '@/app/lib/auth-api';
 import React from 'react';
 import { useParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -11,18 +9,13 @@ import NotFound from '@/app/components/NotFound';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Order } from '@/app/common/interfaces/order.interface';
+import { useOrder } from '@/app/lib/hooks/useOrders';
 const OrderPage: React.FC = () => {
   const { id } = useParams();
   const router = useRouter();
 
-  const { data, isPending, isError } = useQuery<Order>({
-    queryKey: ['order', id],
-    queryFn: async () => {
-      const response = await fetchWithAuth(`/api/orders/findbyId/${id}`);
-      const order = await response.json();
-      return order;
-    },
-  });
+  // Use React Query hook
+  const { data, isPending, isError } = useOrder(id as string);
 
   if (isPending) {
     return <Loading />;
@@ -38,7 +31,7 @@ const OrderPage: React.FC = () => {
 
         <div className="mt-6 sm:mt-8 lg:flex lg:gap-8 min-h-[600px]">
           <div className="w-full divide-y flex flex-col justify-between divide-gray-200 overflow-hidden rounded-lg border border-gray-200 lg:max-w-xl xl:max-w-2xl">
-            {data.items.map((item) => (
+            {data.items.map((item: any) => (
               <div className="space-y-4 p-6" key={item._id}>
                 <div className="flex items-center gap-6">
                   <Link href={`/store/product/${item.product.url}`} className="h-14 w-14 shrink-0">
@@ -75,7 +68,7 @@ const OrderPage: React.FC = () => {
                   <dt className="font-normal text-gray-500">Original price</dt>
                   <dd className="font-medium text-gray-900">
                     {(
-                      data.items.reduce((total, item) => total + item.product.price, 0) +
+                      data.items.reduce((total: number, item: any) => total + item.product.price, 0) +
                       Number(process.env.NEXT_PUBLIC_FIXED_DELIVERY_COST)
                     ).toFixed(2)}
                     zł
@@ -112,7 +105,7 @@ const OrderPage: React.FC = () => {
                 <dt className="text-lg font-bold text-gray-900">Total</dt>
                 <dd className="text-lg font-bold text-gray-900">
                   {(
-                    data.items.reduce((total, item) => total + item.priceAtTimeOfOrder, 0) +
+                    data.items.reduce((total: number, item: any) => total + item.priceAtTimeOfOrder, 0) +
                     Number(process.env.NEXT_PUBLIC_FIXED_DELIVERY_COST)
                   ).toFixed(2)}{' '}
                   zł

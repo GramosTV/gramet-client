@@ -1,11 +1,9 @@
 'use client';
 import { Color } from '@/app/common/interfaces/color.interface';
-import { fetchWithAuth } from '@/app/lib/auth-api';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-import { toast } from 'react-toastify';
+import { useAdminProducts, useDeleteProduct } from '@/app/lib/hooks/useProducts';
 
 interface Res {
   products: AdminProduct[];
@@ -23,41 +21,16 @@ const ViewProducts = () => {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const queryClient = useQueryClient();
 
-  const { data, isPending, isError } = useQuery({
-    queryKey: ['products', page, limit],
-    queryFn: async (): Promise<Res> => {
-      const response = await fetchWithAuth(`/api/products/admin/?page=${page}&limit=${limit}`);
-      return response.json();
-    },
-    retry: 1,
-  });
+  // Use React Query hooks
+  const { data, isPending, isError } = useAdminProducts({ page, limit });
+  const deleteProductMutation = useDeleteProduct();
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this product?')) {
-      mutation.mutate(id);
+      deleteProductMutation.mutate(id);
     }
   };
-  const mutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetchWithAuth(`/api/products/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete product');
-      }
-    },
-    onSuccess: () => {
-      toast.success('Product deleted successfully');
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-      router.push('/admin-panel/products');
-    },
-    onError: (error) => {
-      toast.error(error?.message || 'Failed to delete product');
-    },
-  });
 
   if (isPending) {
     return <div className="py-10 text-center text-sky-600">Fetching products...</div>;
@@ -96,11 +69,13 @@ const ViewProducts = () => {
             </tr>
           </thead>
           <tbody>
-            {data?.products.map((item, idx) => (
+            {data?.products.map((item: AdminProduct, idx: number) => (
               <tr key={idx} className="border-b">
                 <td className="px-4 py-2">{item.name}</td>
                 <td className="px-4 py-2">
-                  <div className="flex space-x-2">{item.colors.reduce((total, color) => total + color.stock, 0)}</div>
+                  <div className="flex space-x-2">
+                    {item.colors.reduce((total: number, color: Color) => total + color.stock, 0)}
+                  </div>
                 </td>
                 <td className="px-4 py-2">{item.public ? 'Yes' : 'No'}</td>
                 <td className="flex justify-end px-4 py-2 space-x-2">
